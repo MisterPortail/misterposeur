@@ -114,6 +114,8 @@ section.demo,section#pros{background-color:var(--bg2)}
 .region{position:absolute;right:max(28px,calc((100vw - 1200px)/2 + 28px));top:96px;z-index:3;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,220,180,.6);display:flex;align-items:center;gap:10px}
 .region i{width:6px;height:6px;border-radius:50%;background:var(--orange);box-shadow:0 0 10px var(--orange);animation:pulse 2s infinite}
 .appsec{padding:120px 0 0;overflow:hidden;position:relative}
+.dots,.swipehint{display:none}
+@media(max-width:980px){.dots{display:flex}.swipehint{display:block}}
 .appsec .ringwrap{margin-top:20px}
 .appsec::after{content:"";position:absolute;left:0;right:0;bottom:0;height:160px;background:linear-gradient(transparent,var(--bg));pointer-events:none}
 @media(max-width:980px){
@@ -288,8 +290,18 @@ footer .links{display:flex;gap:24px}
   .demo .wrap{grid-template-columns:1fr;min-width:0}.field button{flex:1 1 100%}.panel{min-width:0}
   .c4,.c6,.c8{grid-column:span 12}
   .ba{grid-template-columns:1fr}
-  .ringwrap{height:470px}
-  .ring .slot .phone{transform:translate(-50%,-50%) scale(.62)}.ring .slot:first-child,.ring .slot:last-child{display:none}.ring .slot:nth-child(2){transform:translateX(-118px) translateY(14px) perspective(900px) rotateY(22deg) scale(.72)!important}.ring .slot:nth-child(4){transform:translateX(118px) translateY(14px) perspective(900px) rotateY(-22deg) scale(.72)!important}
+  .ringwrap{height:410px;overflow:visible;contain:none;margin-top:0}
+  .ring{position:static;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;touch-action:pan-x pan-y;height:100%}
+  .ring::-webkit-scrollbar{display:none}
+  .ring .slot{position:static;flex:0 0 100%;scroll-snap-align:center;display:flex;justify-content:center;align-items:flex-start;transform:none!important;padding-top:6px}
+  .ring .slot:first-child,.ring .slot:last-child{display:flex}
+  .ring .slot .phone{transform:scale(.68)!important;transform-origin:top center}
+  .ring .fl{animation:none}
+  .floor{display:none}
+  .dots{display:flex;justify-content:center;gap:8px;margin-top:14px;position:relative;z-index:2}
+  .dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.2);display:block;transition:.3s}
+  .dots i.on{background:var(--orange);width:22px;border-radius:4px}
+  .swipehint{text-align:center;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:14px 0 30px}
   section{padding:90px 0}
 }
 @media(max-width:560px){.ringwrap{height:460px}.ring .slot .phone{transform:translate(-50%,-50%) scale(.55)}.hero{padding-top:120px}}
@@ -340,6 +352,7 @@ footer .links{display:flex;gap:24px}
     
   </div>
   <div class="ringwrap" id="ringwrap"><div class="floor"></div><div class="ring" id="ring"></div></div>
+  <div class="dots" id="dots"></div><div class="swipehint" id="swipehint">‹ Faites glisser pour changer d'écran ›</div>
 </section>
 
 
@@ -479,6 +492,11 @@ order.forEach(function(k,i){
   slot.innerHTML='<div class="fl" style="animation-delay:-'+(i*1.3)+'s"><div class="phone"><div class="screen"><div class="island"></div><div class="reflect"></div>'+S[k]+'</div></div></div>';
   ring.appendChild(slot);
 });
+/* ---------- MOBILE CAROUSEL DOTS ---------- */
+(function(){var dots=document.getElementById('dots');if(!dots)return;var slots=ring.children;for(var i=0;i<slots.length;i++){var d=document.createElement('i');if(i===2)d.className='on';dots.appendChild(d)}
+ring.addEventListener('scroll',function(){var i=Math.round(ring.scrollLeft/ring.clientWidth);[].forEach.call(dots.children,function(d,k){d.classList.toggle('on',k===i)})},{passive:true});
+function center(){if(window.innerWidth<=980){ring.scrollLeft=ring.clientWidth*2}}center();window.addEventListener('resize',center);
+dots.addEventListener('click',function(e){var k=[].indexOf.call(dots.children,e.target);if(k>=0)ring.scrollTo({left:ring.clientWidth*k,behavior:'smooth'})});})();
 /* ---------- MAP STORY ---------- */
 var ms=document.querySelector('.mapstory'),mf=document.getElementById('mapfixed'),pinsLayer=document.getElementById('pins'),dim=document.getElementById('mapdim'),appsec=document.getElementById('app'),cam=document.getElementById('cam'),pinsEl=[].slice.call(document.querySelectorAll('#pins .pin')),stcs=document.querySelectorAll('.stc'),ht=document.getElementById('herotext'),cnt=document.getElementById('cnt'),regn=document.getElementById('regname');
 // camera path: map fractions (x,y) + region label
