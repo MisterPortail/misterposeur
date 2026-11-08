@@ -487,16 +487,19 @@ order.forEach(function(k,i){
   ring.appendChild(slot);
 });
 buildRing();window.addEventListener('resize',buildRing);
-var ang=0,vel=.12,drag=false,lx=0,ly=0,lockX=null;
-(function loop(){if(!drag){ang+=vel;vel+=(0.12-vel)*0.02}ring.style.transform='rotateX(-6deg) rotateY('+ang+'deg)';requestAnimationFrame(loop)})();
+var ang=0,target=0,drag=false,lx=0,ly=0,lockX=null,STEP=360/N,idle=0;
+(function loop(){
+  if(!drag){idle++;if(idle>190){target-=STEP;idle=0}ang+=(target-ang)*.08}
+  ring.style.transform='rotateY('+ang+'deg)';requestAnimationFrame(loop)})();
+function snap(){target=Math.round(ang/STEP)*STEP;idle=0}
 wrapEl.addEventListener('mousedown',function(e){drag=true;lx=e.clientX;e.preventDefault()});
-window.addEventListener('mousemove',function(e){if(!drag)return;var dx=e.clientX-lx;lx=e.clientX;ang+=dx*.35;vel=dx*.35});
-window.addEventListener('mouseup',function(){drag=false});
+window.addEventListener('mousemove',function(e){if(!drag)return;var dx=e.clientX-lx;lx=e.clientX;ang+=dx*.35});
+window.addEventListener('mouseup',function(){if(drag){drag=false;snap()}});
 wrapEl.addEventListener('touchstart',function(e){var t=e.touches[0];lx=t.clientX;ly=t.clientY;lockX=null},{passive:true});
 wrapEl.addEventListener('touchmove',function(e){var t=e.touches[0];var dx=t.clientX-lx,dy=t.clientY-ly;
   if(lockX===null){if(Math.abs(dx)<4&&Math.abs(dy)<4)return;lockX=Math.abs(dx)>Math.abs(dy)}
-  if(!lockX)return;e.preventDefault();drag=true;ang+=dx*.4;vel=dx*.4;lx=t.clientX;ly=t.clientY},{passive:false});
-wrapEl.addEventListener('touchend',function(){drag=false;lockX=null});
+  if(!lockX)return;e.preventDefault();drag=true;ang+=dx*.4;lx=t.clientX;ly=t.clientY},{passive:false});
+wrapEl.addEventListener('touchend',function(){if(drag){drag=false;snap()}lockX=null});
 /* ---------- MAP STORY ---------- */
 var ms=document.querySelector('.mapstory'),mf=document.getElementById('mapfixed'),pinsLayer=document.getElementById('pins'),dim=document.getElementById('mapdim'),appsec=document.getElementById('app'),cam=document.getElementById('cam'),pinsEl=[].slice.call(document.querySelectorAll('#pins .pin')),stcs=document.querySelectorAll('.stc'),ht=document.getElementById('herotext'),cnt=document.getElementById('cnt'),regn=document.getElementById('regname');
 // camera path: map fractions (x,y) + region label
