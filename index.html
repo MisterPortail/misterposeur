@@ -205,6 +205,9 @@ h2{font-size:clamp(34px,4.8vw,60px);line-height:1;letter-spacing:-.035em;font-we
 .panel .top b{font-size:15px}
 .radar{position:relative;height:230px;border-radius:22px;overflow:hidden;background:#0d0f14;border:1px solid var(--line);
   background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:26px 26px}
+.rmap{position:absolute;inset:0;background:#0d0f14 url(nightmap.jpg) no-repeat;background-size:400% auto;background-position:50% 48%;opacity:.95;transition:background-position .9s cubic-bezier(.2,.8,.2,1)}
+.rfade{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,transparent 45%,rgba(13,15,20,.75) 100%)}
+.rcity{position:absolute;left:12px;top:10px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,220,180,.85);font-weight:800;text-shadow:0 1px 2px #000}
 .radar .sweep{position:absolute;left:50%;top:50%;width:600px;height:600px;transform:translate(-50%,-50%);border-radius:50%;background:conic-gradient(from 0deg,rgba(242,107,58,.0) 0deg,rgba(242,107,58,.45) 40deg,transparent 60deg);animation:sweep 2.2s linear infinite;opacity:0;transition:opacity .4s}
 .radar.on .sweep{opacity:1}
 @keyframes sweep{to{transform:translate(-50%,-50%) rotate(360deg)}}
@@ -367,9 +370,10 @@ footer .links{display:flex;gap:24px}
     <div class="panel rv d1">
       <div class="top"><b id="ptitle">Poseurs autour de vous</b><span class="pill or" id="pcount" style="font-size:9px">En attente</span></div>
       <div class="radar" id="radar">
+        <div class="rmap" id="rmap"></div><div class="rfade"></div>
         <div class="sweep"></div>
         <div class="ringz" style="width:120px;height:120px"></div><div class="ringz" style="width:240px;height:240px"></div><div class="ringz" style="width:360px;height:360px"></div>
-        <div class="me"></div>
+        <div class="me"></div><div class="rcity" id="rcity"></div>
         <div class="pin" style="left:30%;top:42%"><b>6 km</b><svg width="30" height="30" viewBox="0 0 24 24" fill="#f26b3a"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg></div>
         <div class="pin" style="left:68%;top:30%"><b>11 km</b><svg width="30" height="30" viewBox="0 0 24 24" fill="#f9a03f"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg></div>
         <div class="pin" style="left:58%;top:76%"><b>18 km</b><svg width="30" height="30" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg></div>
@@ -536,15 +540,18 @@ var chips=document.querySelectorAll('.chip'),proj='Portail coulissant';
 chips.forEach(function(c){c.addEventListener('click',function(){chips.forEach(function(x){x.classList.remove('on')});c.classList.add('on');proj=c.dataset.p})});
 var base={'Portail coulissant':1290,'Clôture alu':1850,'Fenêtres':2140,'Volets roulants':980,'Pergola':2460};
 var names=[['ML','#1b2a4a','Menuiserie Lefèvre','4.9','128'],['SB','#f26b3a','S. Bernard Fermetures','4.8','74'],['AP','#f9a03f','Alu Pose','4.7','52']];
+var DEP={"01":["Bourg-en-Bresse",69.85,51.39],"02":["Laon",59.27,18.22],"03":["Moulins",57.37,47.92],"04":["Digne-les-Bains",76.49,72.38],"05":["Gap",75.44,67.72],"06":["Nice",83.26,76.24],"07":["Privas",65.71,65.94],"08":["Charleville-Mézières",66.50,16.14],"09":["Foix",46.07,83.56],"10":["Troyes",62.23,30.69],"11":["Carcassonne",50.93,81.09],"12":["Rodez",52.37,69.80],"13":["Marseille",70.77,80.20],"14":["Caen",33.05,21.98],"15":["Aurillac",51.52,64.06],"16":["Angoulême",36.54,56.93],"17":["La Rochelle",27.93,51.88],"18":["Bourges",51.26,42.77],"19":["Tulle",47.12,60.69],"2A":["Ajaccio",92.92,93.76],"2B":["Bastia",97.59,86.14],"21":["Dijon",68.61,40.40],"22":["Saint-Brieuc",17.35,28.61],"23":["Guéret",47.77,51.78],"24":["Périgueux",40.22,61.58],"25":["Besançon",75.05,41.19],"26":["Valence",67.62,64.06],"27":["Évreux",43.04,23.56],"28":["Chartres",45.28,29.21],"29":["Quimper",8.54,33.76],"30":["Nîmes",64.14,74.85],"31":["Toulouse",44.95,77.23],"32":["Auch",39.36,76.73],"33":["Bordeaux",31.67,64.95],"34":["Montpellier",60.98,77.13],"35":["Rennes",24.45,32.57],"36":["Châteauroux",46.59,45.45],"37":["Tours",40.02,39.70],"38":["Grenoble",73.07,61.49],"39":["Lons-le-Saunier",71.96,46.83],"40":["Mont-de-Marsan",32.20,74.36],"41":["Blois",44.23,37.72],"42":["Saint-Étienne",64.33,59.11],"43":["Le Puy-en-Velay",60.98,62.97],"44":["Nantes",25.30,41.39],"45":["Orléans",47.97,34.65],"46":["Cahors",44.95,68.81],"47":["Agen",39.56,71.29],"48":["Mende",58.49,68.12],"49":["Angers",31.87,38.91],"50":["Saint-Lô",28.32,22.57],"51":["Reims",61.97,21.19],"52":["Chaumont",69.26,32.57],"53":["Laval",30.43,32.97],"54":["Nancy",76.10,26.83],"55":["Bar-le-Duc",69.39,26.04],"56":["Vannes",17.35,37.03],"57":["Metz",76.10,22.57],"58":["Nevers",56.25,43.66],"59":["Lille",55.59,7.62],"60":["Beauvais",49.15,19.50],"61":["Alençon",36.08,29.41],"62":["Arras",53.75,10.99],"63":["Clermont-Ferrand",55.79,55.64],"64":["Pau",33.05,80.20],"65":["Tarbes",35.95,80.89],"66":["Perpignan",54.54,86.14],"67":["Strasbourg",86.41,28.02],"68":["Colmar",83.85,32.87],"69":["Lyon",67.29,55.84],"70":["Vesoul",75.90,37.43],"71":["Mâcon",67.23,50.40],"72":["Le Mans",36.80,33.66],"73":["Chambéry",74.39,57.82],"74":["Annecy",75.77,54.46],"75":["Paris",50.93,25.15],"76":["Rouen",42.71,19.41],"77":["Melun",52.97,28.32],"78":["Versailles",49.48,25.74],"79":["Niort",32.46,50.30],"80":["Amiens",50.60,14.85],"81":["Albi",49.61,73.96],"82":["Montauban",44.36,73.07],"83":["Toulon",74.45,81.98],"84":["Avignon",67.09,73.76],"85":["La Roche-sur-Yon",26.09,46.83],"86":["Poitiers",37.72,47.72],"87":["Limoges",43.77,55.15],"88":["Épinal",77.87,31.98],"89":["Auxerre",58.95,35.64],"90":["Belfort",80.57,37.23],"91":["Évry",51.52,27.43],"92":["Nanterre",50.01,24.85],"93":["Bobigny",51.52,24.65],"94":["Créteil",51.65,25.84],"95":["Cergy",49.15,23.37]};
+var rmap=document.getElementById('rmap'),rcity=document.getElementById('rcity');
 var radar=document.getElementById('radar'),res=document.getElementById('res'),empty=document.getElementById('empty'),pc=document.getElementById('pcount'),pt=document.getElementById('ptitle'),busy=false;
 function animNum(el,to){var s=performance.now();(function f(n){var p=Math.min(1,(n-s)/900);el.textContent=Math.round(to*(1-Math.pow(1-p,3))).toLocaleString('fr-FR')+' €';if(p<1)requestAnimationFrame(f)})(s)}
 document.getElementById('go').addEventListener('click',function(){
   if(busy)return;busy=true;
   var cp=document.getElementById('cp').value.trim();if(!/^\d{5}$/.test(cp)){cp='69003';document.getElementById('cp').value=cp}
-  var dep=cp.slice(0,2);
+  var dep=cp.slice(0,2);if(dep==='20'){dep=(+cp.slice(0,3)<=201)?'2A':'2B'}
+  var city=DEP[dep];if(city){var Wb=rmap.clientWidth,Hb=rmap.clientHeight,Wi=Wb*4,Hi=Wi*2020/2100;var px=(city[1]/100*Wi-Wb/2)/(Wi-Wb)*100,py=(city[2]/100*Hi-Hb/2)/(Hi-Hb)*100;rmap.style.backgroundPosition=px+'% '+py+'%';rcity.textContent=city[0]+' · '+dep}else{rcity.textContent=''}
   empty.classList.add('off');res.innerHTML='';radar.classList.add('on');
   radar.querySelectorAll('.pin').forEach(function(p){p.classList.remove('on')});
-  pt.textContent=proj+' · '+cp;pc.textContent='Recherche…';
+  pt.textContent=proj+' · '+(city?city[0]+' ('+cp+')':cp);pc.textContent='Recherche…';
   var pins=radar.querySelectorAll('.pin');
   pins.forEach(function(p,i){setTimeout(function(){p.classList.add('on')},900+i*600)});
   setTimeout(function(){
