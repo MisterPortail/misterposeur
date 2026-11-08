@@ -87,7 +87,7 @@ h1{font-size:clamp(46px,7.4vw,104px);line-height:.95;letter-spacing:-.04em;font-
 .appsec::after{display:none}
 section.demo,section#why,section#pros,section.cta,footer{position:relative;z-index:1;background-color:var(--bg)}
 section.demo,section#pros{background-color:var(--bg2)}
-.cam{position:absolute;left:0;top:0;height:240vh;aspect-ratio:1050/1010;will-change:transform;backface-visibility:hidden;transform:translate3d(0,0,0)}
+.cam{position:absolute;left:0;top:0;height:175vh;aspect-ratio:1050/1010;will-change:transform;backface-visibility:hidden;transform:translate3d(0,0,0)}
 .nightmap{position:absolute;left:0;top:0;width:100%;height:100%;display:block;user-select:none;-webkit-user-select:none;pointer-events:none}50%{opacity:1}}
 .cities span{position:absolute;transform:translate(-50%,14px);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,220,180,.55);font-weight:700;white-space:nowrap;text-shadow:0 0 12px rgba(242,107,58,.6)}
 .vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 64% 50%,transparent 40%,rgba(5,5,6,.7) 85%),linear-gradient(90deg,rgba(5,5,6,.97) 0%,rgba(5,5,6,.82) 36%,transparent 58%),linear-gradient(180deg,rgba(5,5,6,.6),transparent 18%,transparent 85%,rgba(5,5,6,.9))}
@@ -120,7 +120,7 @@ section.demo,section#pros{background-color:var(--bg2)}
 .appsec::after{content:"";position:absolute;left:0;right:0;bottom:0;height:160px;background:linear-gradient(transparent,var(--bg));pointer-events:none}
 @media(max-width:980px){
   .mapstory{height:340vh}
-  .cam{height:185vh}
+  .cam{height:135vh}
   .vignette{background:linear-gradient(180deg,rgba(5,5,6,.75),transparent 16%,transparent 34%,rgba(5,5,6,.9) 52%,#050506 68%)}
   .herotext{top:auto;bottom:0;transform:none;padding:0 22px 40px;max-width:none;width:100%}
   .herotext h1{font-size:clamp(36px,10vw,56px)}
@@ -500,7 +500,7 @@ wrapEl.addEventListener('touchend',function(){drag=false;lockX=null});
 /* ---------- MAP STORY ---------- */
 var ms=document.querySelector('.mapstory'),mf=document.getElementById('mapfixed'),pinsLayer=document.getElementById('pins'),dim=document.getElementById('mapdim'),appsec=document.getElementById('app'),cam=document.getElementById('cam'),pinsEl=[].slice.call(document.querySelectorAll('#pins .pin')),stcs=document.querySelectorAll('.stc'),ht=document.getElementById('herotext'),cnt=document.getElementById('cnt'),regn=document.getElementById('regname');
 // camera path: map fractions (x,y) + region label
-var PATH=[[0.50,0.25,'Bretagne · Normandie · Île-de-France'],[0.52,0.40,'Pays de la Loire · Centre'],[0.52,0.54,'Bourgogne · Auvergne · Rhône-Alpes'],[0.52,0.68,'Nouvelle-Aquitaine · Occitanie'],[0.52,0.84,'Provence · Côte d\'Azur · Corse']];
+var PATH=[[0.50,0.30,'Bretagne · Normandie · Île-de-France'],[0.52,0.40,'Pays de la Loire · Centre'],[0.52,0.54,'Bourgogne · Auvergne · Rhône-Alpes'],[0.52,0.68,'Nouvelle-Aquitaine · Occitanie'],[0.52,0.78,'Provence · Côte d\'Azur · Corse']];
 var NP=pinsEl.length,shown=0,cx=0,cy=0,tx=0,ty=0,queue=[],camW=cam.offsetWidth,camH=cam.offsetHeight;
 function camLoop(){cx+=(tx-cx)*.16;cy+=(ty-cy)*.16;cam.style.transform='translate3d('+cx.toFixed(2)+'px,'+cy.toFixed(2)+'px,0)';requestAnimationFrame(camLoop)}
 setInterval(function(){var k=queue.length>5?2:1;while(k--){var e=queue.shift();if(e){e._on=true;e.classList.add('on')}}var n=0;pinsEl.forEach(function(x){if(x._on)n++});if(cnt.textContent!=n)cnt.textContent=n},220);
@@ -519,7 +519,7 @@ function mapTick(){
   stcs.forEach(function(s){s.classList.toggle('on',p>=+s.dataset.from&&p<+s.dataset.to)});
   // pins: queue reveals when they enter the view band; dim those behind the text column
   pinsEl.forEach(function(e){var sy=ty+e._y*H,sx=tx+e._x*W;
-    if(!e._on&&!e._q&&sy>vh*.05&&sy<vh*.75&&sx>-20&&sx<vw+20){e._q=true;queue.push(e)}
+    if(!e._on&&!e._q&&sy>vh*.08&&sy<vh*.62&&sx>-20&&sx<vw+20){e._q=true;queue.push(e)}
     e.style.opacity=(vw>980?(sx<vw*.46):(sy>vh*.40))?.15:1;
   });
   var n=0;pinsEl.forEach(function(e){if(e._on)n++});
