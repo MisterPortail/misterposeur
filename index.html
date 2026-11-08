@@ -132,6 +132,17 @@ section.demo,section#pros{background-color:var(--bg2)}
   .pin img{width:34px}.pin .lbl{top:-46px;left:36px}.pin .lbl b{font-size:13px}.pin .lbl{font-size:11px}
 }
 
+
+/* 3D thickness */
+.ring .phone{box-shadow:none;background:#141418;border:1.5px solid #3a3a40}
+.ring .phone .screen{transform:translateZ(.6px)}
+.ring .phone .edge{position:absolute;inset:-1.5px;border-radius:44px;background:linear-gradient(90deg,#2a2a30,#4a4a52 50%,#2a2a30);display:block;backface-visibility:visible}
+.ring .phone .back{transform:rotateY(180deg) translateZ(12.5px);background:linear-gradient(160deg,#23232a,#0e0e12);box-shadow:inset 0 0 0 1.5px #3a3a40}
+.ring .phone::before,.ring .phone::after,.ring .phone .side{display:none}
+.ring .slot::after{content:"";position:absolute;left:50%;top:50%;width:200px;height:420px;transform:translate(-50%,-30%) translateZ(-20px);background:radial-gradient(ellipse at 50% 100%,rgba(0,0,0,.6),transparent 70%);filter:blur(10px);pointer-events:none}
+.ringwrap{perspective:1700px}
+.floor{bottom:10px;width:1200px;height:300px;background:radial-gradient(ellipse,rgba(242,107,58,.45),rgba(242,107,58,.08) 45%,transparent 70%)}
+
 /* ===== PHONE ===== */
 .phone{width:272px;height:566px;border-radius:44px;background:#0b0b0d;padding:9px;position:relative;transform-style:preserve-3d;
   box-shadow:0 0 0 1.5px #2a2a2e,0 0 0 3px #0a0a0a,0 30px 80px rgba(0,0,0,.7)}
@@ -478,8 +489,9 @@ profil:ST+'<div class="sc"><div style="height:70px;border-radius:16px;background
 /* ---------- 3D RING ---------- */
 var order=['login','search','devis','suivi','pro','profil'];
 var ring=document.getElementById('ring'),wrapEl=document.getElementById('ringwrap'),N=order.length;
-var BACK='<div class="back"><div class="cam"><i></i><i></i><i></i></div><div class="lg"><img src="logo.png" alt=""></div></div>';
-function ringR(){return window.innerWidth<=980?Math.max(150,Math.min(230,window.innerWidth*.55)):320}
+var EDGES='';for(var q=1;q<=9;q++){EDGES+='<i class="edge" style="transform:translateZ(-'+(q*1.3)+'px)"></i>'}
+var BACK=EDGES+'<div class="back"><div class="cam"><i></i><i></i><i></i></div><div class="lg"><img src="logo.png" alt=""></div></div>';
+function ringR(){return window.innerWidth<=980?Math.max(150,Math.min(230,window.innerWidth*.55)):380}
 function buildRing(){var R=ringR();[].forEach.call(ring.children,function(slot,i){slot.style.transform='rotateY('+(i*360/N)+'deg) translateZ('+R+'px)'})}
 order.forEach(function(k,i){
   var slot=document.createElement('div');slot.className='slot';
