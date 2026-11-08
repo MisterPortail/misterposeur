@@ -25,17 +25,6 @@ a{color:inherit;text-decoration:none}
 body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:999;opacity:.045;mix-blend-mode:screen;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
 
-/* cursor */
-@media(pointer:fine){
-  body{cursor:none}a,button,.chip{cursor:none}
-  .cur{position:fixed;top:0;left:0;z-index:1000;pointer-events:none;width:10px;height:10px;border-radius:50%;background:var(--orange);transform:translate(-50%,-50%);transition:width .25s,height .25s,background .25s}
-  .cur2{position:fixed;top:0;left:0;z-index:1000;pointer-events:none;width:38px;height:38px;border-radius:50%;border:1.5px solid rgba(242,107,58,.6);transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .3s,background .3s}
-  body.hov .cur{width:4px;height:4px}
-  body.hov .cur2{width:64px;height:64px;background:rgba(242,107,58,.12);border-color:rgba(242,107,58,.9)}
-  body.grab .cur2{width:80px;height:80px;border-style:dashed}
-}
-@media(pointer:coarse){.cur,.cur2{display:none}}
-
 /* nav */
 nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:16px 0;transition:.3s;border-bottom:1px solid transparent}
 nav.scrolled{background:rgba(5,5,6,.7);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-color:var(--line)}
@@ -238,8 +227,6 @@ h2{font-size:clamp(34px,4.8vw,60px);line-height:1;letter-spacing:-.035em;font-we
 .bento{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}
 .cell{border:1px solid var(--line);border-radius:28px;padding:32px;background:rgba(255,255,255,.025);position:relative;overflow:hidden;transition:.3s}
 .cell:hover{border-color:rgba(242,107,58,.5);transform:translateY(-4px)}
-.cell::before{content:"";position:absolute;inset:0;background:radial-gradient(300px 200px at var(--x,50%) var(--y,50%),rgba(242,107,58,.14),transparent 60%);opacity:0;transition:opacity .3s;pointer-events:none}
-.cell:hover::before{opacity:1}
 .cell h3{font-size:21px;font-weight:800;letter-spacing:-.02em;margin:18px 0 8px}.cell p{color:var(--muted);font-size:15px}
 .cell .ic{width:46px;height:46px;border-radius:14px;background:var(--grad);display:grid;place-items:center;box-shadow:0 8px 24px rgba(242,107,58,.35)}
 .c4{grid-column:span 4}.c6{grid-column:span 6}.c8{grid-column:span 8}
@@ -300,7 +287,6 @@ footer .links{display:flex;gap:24px}
 </style>
 </head>
 <body>
-<div class="cur"></div><div class="cur2"></div>
 
 <nav id="nav"><div class="wrap">
   <a href="#" class="brand"><span class="mark"><img src="logo.png" alt="Mister Poseur"></span>MISTER POSEUR</a>
@@ -311,7 +297,7 @@ footer .links{display:flex;gap:24px}
 <div class="mapfixed" id="mapfixed"><div class="cam" id="cam">
       <img class="nightmap" src="nightmap.jpg" alt="" draggable="false">
       
-      <div class="pins" id="pins"><div class="pin r" style="left:44.95%;top:77.23%" data-i="0"><img src="pin.png" alt=""><span class="lbl"><b>ARBAT</b>Toulouse</span></div><div class="pin r" style="left:67.29%;top:55.84%" data-i="1"><img src="pin.png" alt=""><span class="lbl"><b>Art Bâtiment</b>Lyon</span></div><div class="pin r" style="left:25.3%;top:41.39%" data-i="2"><img src="pin.png" alt=""><span class="lbl"><b>François Bâtiment</b>Nantes</span></div><div class="pin l" style="left:55.59%;top:7.62%" data-i="3"><img src="pin.png" alt=""><span class="lbl"><b>Menuiserie Lefèvre</b>Lille</span></div><div class="pin r" style="left:31.67%;top:64.95%" data-i="4"><img src="pin.png" alt=""><span class="lbl"><b>Alu Pose 33</b>Bordeaux</span></div><div class="pin r" style="left:24.45%;top:32.57%" data-i="5"><img src="pin.png" alt=""><span class="lbl"><b>S. Bernard Fermetures</b>Rennes</span></div><div class="pin l" style="left:70.77%;top:80.2%" data-i="6"><img src="pin.png" alt=""><span class="lbl"><b>Portails du Sud</b>Marseille</span></div><div class="pin l" style="left:86.41%;top:28.02%" data-i="7"><img src="pin.png" alt=""><span class="lbl"><b>Fermetures Alsace</b>Strasbourg</span></div><div class="pin r" style="left:50.93%;top:25.15%" data-i="8"><img src="pin.png" alt=""><span class="lbl"><b>Atelier Morel</b>Paris</span></div><div class="pin l" style="left:83.19%;top:76.24%" data-i="9"><img src="pin.png" alt=""><span class="lbl"><b>Azur Menuiserie</b>Nice</span></div><div class="pin r" style="left:60.98%;top:77.13%" data-i="10"><img src="pin.png" alt=""><span class="lbl"><b>Occitane Pose</b>Montpellier</span></div><div class="pin r" style="left:42.71%;top:19.41%" data-i="11"><img src="pin.png" alt=""><span class="lbl"><b>Normandie Fermetures</b>Rouen</span></div><div class="pin r" style="left:40.02%;top:39.7%" data-i="12"><img src="pin.png" alt=""><span class="lbl"><b>Loire Menuiserie</b>Tours</span></div><div class="pin r" style="left:55.79%;top:55.64%" data-i="13"><img src="pin.png" alt=""><span class="lbl"><b>Auvergne Alu</b>Clermont-Ferrand</span></div><div class="pin l" style="left:68.61%;top:40.4%" data-i="14"><img src="pin.png" alt=""><span class="lbl"><b>Bourgogne Portails</b>Dijon</span></div><div class="pin r" style="left:43.77%;top:55.15%" data-i="15"><img src="pin.png" alt=""><span class="lbl"><b>Limousin Pose</b>Limoges</span></div><div class="pin l" style="left:73.07%;top:61.49%" data-i="16"><img src="pin.png" alt=""><span class="lbl"><b>Alpes Menuiserie</b>Grenoble</span></div><div class="pin r" style="left:5.98%;top:29.8%" data-i="17"><img src="pin.png" alt=""><span class="lbl"><b>Breizh Fermetures</b>Brest</span></div><div class="pin l" style="left:76.1%;top:22.57%" data-i="18"><img src="pin.png" alt=""><span class="lbl"><b>Lorraine Pose</b>Metz</span></div><div class="pin r" style="left:33.05%;top:21.98%" data-i="19"><img src="pin.png" alt=""><span class="lbl"><b>Caen Alu</b>Caen</span></div><div class="pin r" style="left:47.97%;top:34.65%" data-i="20"><img src="pin.png" alt=""><span class="lbl"><b>Val de Loire Portails</b>Orléans</span></div><div class="pin l" style="left:61.97%;top:21.19%" data-i="21"><img src="pin.png" alt=""><span class="lbl"><b>Champagne Menuiserie</b>Reims</span></div><div class="pin r" style="left:54.54%;top:86.14%" data-i="22"><img src="pin.png" alt=""><span class="lbl"><b>Catalane Pose</b>Perpignan</span></div><div class="pin r" style="left:25.83%;top:78.32%" data-i="23"><img src="pin.png" alt=""><span class="lbl"><b>Basque Fermetures</b>Bayonne</span></div><div class="pin l" style="left:92.92%;top:93.76%" data-i="24"><img src="pin.png" alt=""><span class="lbl"><b>Corsica Pose</b>Ajaccio</span></div><div class="pin r" style="left:37.72%;top:47.72%" data-i="25"><img src="pin.png" alt=""><span class="lbl"><b>Poitou Menuiserie</b>Poitiers</span></div><div class="pin r" style="left:36.8%;top:33.66%" data-i="26"><img src="pin.png" alt=""><span class="lbl"><b>Sarthe Alu</b>Le Mans</span></div><div class="pin r" style="left:50.6%;top:14.85%" data-i="27"><img src="pin.png" alt=""><span class="lbl"><b>Picardie Pose</b>Amiens</span></div><div class="pin l" style="left:75.05%;top:41.19%" data-i="28"><img src="pin.png" alt=""><span class="lbl"><b>Doubs Fermetures</b>Besançon</span></div><div class="pin r" style="left:33.05%;top:80.2%" data-i="29"><img src="pin.png" alt=""><span class="lbl"><b>Béarn Pose</b>Pau</span></div><div class="pin r" style="left:31.87%;top:38.91%" data-i="30"><img src="pin.png" alt=""><span class="lbl"><b>Anjou Portails</b>Angers</span></div><div class="pin r" style="left:64.14%;top:74.85%" data-i="31"><img src="pin.png" alt=""><span class="lbl"><b>Gard Menuiserie</b>Nîmes</span></div><div class="pin l" style="left:75.77%;top:54.46%" data-i="32"><img src="pin.png" alt=""><span class="lbl"><b>Savoie Alu</b>Annecy</span></div></div>
+      <div class="pins" id="pins"><div class="pin r" style="left:67.29%;top:55.84%" data-i="1"><img src="pin.png" alt=""><span class="lbl"><b>Art Bâtiment</b>Lyon</span></div><div class="pin r" style="left:25.3%;top:41.39%" data-i="2"><img src="pin.png" alt=""><span class="lbl"><b>François Bâtiment</b>Nantes</span></div><div class="pin l" style="left:55.59%;top:7.62%" data-i="3"><img src="pin.png" alt=""><span class="lbl"><b>Menuiserie Lefèvre</b>Lille</span></div><div class="pin r" style="left:31.67%;top:64.95%" data-i="4"><img src="pin.png" alt=""><span class="lbl"><b>Alu Pose 33</b>Bordeaux</span></div><div class="pin l" style="left:70.77%;top:80.2%" data-i="6"><img src="pin.png" alt=""><span class="lbl"><b>Portails du Sud</b>Marseille</span></div><div class="pin r" style="left:50.93%;top:25.15%" data-i="8"><img src="pin.png" alt=""><span class="lbl"><b>Atelier Morel</b>Paris</span></div></div>
     </div>
     <div class="vignette"></div><div class="mapdim" id="mapdim"></div></div>
 <header class="mapstory" id="top">
@@ -431,7 +417,7 @@ footer .links{display:flex;gap:24px}
     </div>
     <div class="rv d1" style="position:relative;height:620px;perspective:1400px;display:grid;place-items:center" id="prostage">
       <div class="glow" style="position:absolute;left:50%;top:50%;width:460px;height:460px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(242,107,58,.3),transparent 60%);filter:blur(30px)"></div>
-      <div class="phone" id="prophone" style="transform:rotateY(-18deg) rotateX(6deg) rotateZ(4deg);transition:transform .2s"><div class="screen" id="proscreen"><div class="island"></div><div class="reflect"></div></div><div class="back"><div class="cam"><i></i><i></i><i></i></div></div></div>
+      <div class="phone" id="prophone" style="transform:rotateY(-18deg) rotateX(6deg) rotateZ(4deg)"><div class="screen" id="proscreen"><div class="island"></div><div class="reflect"></div></div><div class="back"><div class="cam"><i></i><i></i><i></i></div></div></div>
     </div>
   </div>
 </section>
@@ -484,9 +470,9 @@ order.forEach(function(k,i){
   ring.appendChild(slot);
 });
 /* ---------- MAP STORY ---------- */
-var ms=document.querySelector('.mapstory'),mf=document.getElementById('mapfixed'),pinsLayer=document.getElementById('pins'),dim=document.getElementById('mapdim'),appsec=document.getElementById('app'),cam=document.getElementById('cam'),pinsEl=[].slice.call(document.querySelectorAll('.pin')),stcs=document.querySelectorAll('.stc'),ht=document.getElementById('herotext'),cnt=document.getElementById('cnt'),regn=document.getElementById('regname');
+var ms=document.querySelector('.mapstory'),mf=document.getElementById('mapfixed'),pinsLayer=document.getElementById('pins'),dim=document.getElementById('mapdim'),appsec=document.getElementById('app'),cam=document.getElementById('cam'),pinsEl=[].slice.call(document.querySelectorAll('#pins .pin')),stcs=document.querySelectorAll('.stc'),ht=document.getElementById('herotext'),cnt=document.getElementById('cnt'),regn=document.getElementById('regname');
 // camera path: map fractions (x,y) + region label
-var PATH=[[0.52,0.24,'Bretagne · Normandie · Île-de-France'],[0.52,0.40,'Pays de la Loire · Centre'],[0.52,0.54,'Bourgogne · Auvergne · Rhône-Alpes'],[0.52,0.68,'Nouvelle-Aquitaine · Occitanie'],[0.52,0.84,'Provence · Côte d\'Azur · Corse'],[0.52,0.98,'Méditerranée']];
+var PATH=[[0.52,0.24,'Bretagne · Normandie · Île-de-France'],[0.52,0.40,'Pays de la Loire · Centre'],[0.52,0.54,'Bourgogne · Auvergne · Rhône-Alpes'],[0.52,0.68,'Nouvelle-Aquitaine · Occitanie'],[0.52,0.84,'Provence · Côte d\'Azur · Corse']];
 var NP=pinsEl.length,shown=0,cx=0,cy=0,tx=0,ty=0,queue=[],camW=cam.offsetWidth,camH=cam.offsetHeight;
 function camLoop(){cx+=(tx-cx)*.16;cy+=(ty-cy)*.16;cam.style.transform='translate3d('+cx.toFixed(2)+'px,'+cy.toFixed(2)+'px,0)';requestAnimationFrame(camLoop)}
 setInterval(function(){var k=queue.length>5?2:1;while(k--){var e=queue.shift();if(e){e._on=true;e.classList.add('on')}}var n=0;pinsEl.forEach(function(x){if(x._on)n++});if(cnt.textContent!=n)cnt.textContent=n},220);
@@ -498,14 +484,14 @@ function mapTick(){
   var fade=Math.max(0,Math.min(1,1-( -(ar.bottom-window.innerHeight) )/260));mf.style.opacity=ar.bottom<window.innerHeight?fade:1;
   var past=Math.max(0,Math.min(1,(-(r.bottom-window.innerHeight))/320));pinsLayer.style.opacity=1-past;dim.style.opacity=past*.55;
   ht.style.opacity=Math.max(0,1-p*9);ht.style.pointerEvents=p>.1?'none':'auto';
-  var f=lerpPath(pc);var fl=lerpPath(p);var W=camW,H=camH,vw=window.innerWidth,vh=window.innerHeight;
+  var f=lerpPath(p);var fl=f;var W=camW,H=camH,vw=window.innerWidth,vh=window.innerHeight;
   var fx=vw>980?vw*.66:vw*.5,fy=vw>980?vh*.5:vh*.42;
   tx=fx-f[0]*W;ty=fy-f[1]*H;
   if(regn.textContent!==fl[2])regn.textContent=fl[2];
   stcs.forEach(function(s){s.classList.toggle('on',p>=+s.dataset.from&&p<+s.dataset.to)});
   // pins: queue reveals when they enter the view band; dim those behind the text column
   pinsEl.forEach(function(e){var sy=ty+e._y*H,sx=tx+e._x*W;
-    if(!e._on&&!e._q&&sy>-vh*.05&&sy<vh*.66&&sx>-20&&sx<vw+20){e._q=true;queue.push(e)}
+    if(!e._on&&!e._q&&sy>vh*.05&&sy<vh*.75&&sx>-20&&sx<vw+20){e._q=true;queue.push(e)}
     e.style.opacity=(vw>980&&sx<vw*.46)?.18:1;
   });
   var n=0;pinsEl.forEach(function(e){if(e._on)n++});
@@ -540,10 +526,6 @@ steps.forEach(function(s){so.observe(s)});
 
 /* ---------- PRO PHONE ---------- */
 document.getElementById('proscreen').insertAdjacentHTML('beforeend',S.pro);
-var pst=document.getElementById('prostage'),pph=document.getElementById('prophone');
-pst.addEventListener('mousemove',function(e){var r=pst.getBoundingClientRect();var x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;pph.style.transform='rotateY('+(-18+x*30)+'deg) rotateX('+(6-y*20)+'deg) rotateZ(4deg)'});
-pst.addEventListener('mouseleave',function(){pph.style.transform='rotateY(-18deg) rotateX(6deg) rotateZ(4deg)'});
-
 /* ---------- DEMO ---------- */
 var chips=document.querySelectorAll('.chip'),proj='Portail coulissant';
 chips.forEach(function(c){c.addEventListener('click',function(){chips.forEach(function(x){x.classList.remove('on')});c.classList.add('on');proj=c.dataset.p})});
@@ -592,18 +574,6 @@ function toast(){if(window.scrollY<ms.offsetHeight-window.innerHeight){setTimeou
 }
 setTimeout(toast,3500);
 
-/* ---------- CURSOR + MAGNETIC + CELL SPOTLIGHT ---------- */
-if(window.matchMedia('(pointer:fine)').matches){
-  var c1=document.querySelector('.cur'),c2=document.querySelector('.cur2'),mx=0,my=0,cx=0,cy=0;
-  window.addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY;c1.style.transform='translate('+mx+'px,'+my+'px) translate(-50%,-50%)'});
-  (function cl(){cx+=(mx-cx)*.18;cy+=(my-cy)*.18;c2.style.transform='translate('+cx+'px,'+cy+'px) translate(-50%,-50%)';requestAnimationFrame(cl)})();
-  document.querySelectorAll('a,button,.chip').forEach(function(el){el.addEventListener('mouseenter',function(){document.body.classList.add('hov')});el.addEventListener('mouseleave',function(){document.body.classList.remove('hov')})});
-  document.querySelectorAll('.mag').forEach(function(el){
-    el.addEventListener('mousemove',function(e){var r=el.getBoundingClientRect();var x=e.clientX-r.left-r.width/2,y=e.clientY-r.top-r.height/2;el.style.transform='translate('+x*.25+'px,'+y*.25+'px)'});
-    el.addEventListener('mouseleave',function(){el.style.transform=''});
-  });
-  document.querySelectorAll('.cell').forEach(function(el){el.addEventListener('mousemove',function(e){var r=el.getBoundingClientRect();el.style.setProperty('--x',(e.clientX-r.left)+'px');el.style.setProperty('--y',(e.clientY-r.top)+'px')})});
-}
 })();
 </script>
 </body>
