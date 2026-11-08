@@ -417,7 +417,7 @@ footer .links{display:flex;gap:24px}
     </div>
     <div class="rv d1" style="position:relative;height:620px;perspective:1400px;display:grid;place-items:center" id="prostage">
       <div class="glow" style="position:absolute;left:50%;top:50%;width:460px;height:460px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(242,107,58,.3),transparent 60%);filter:blur(30px)"></div>
-      <div class="phone" id="prophone" style="transform:rotateY(-18deg) rotateX(6deg) rotateZ(4deg)"><div class="screen" id="proscreen"><div class="island"></div><div class="reflect"></div></div><div class="back"><div class="cam"><i></i><i></i><i></i></div></div></div>
+      <div class="phone" id="prophone" style="transform:rotateY(-18deg) rotateX(6deg) rotateZ(4deg);transition:transform .2s"><div class="screen" id="proscreen"><div class="island"></div><div class="reflect"></div></div><div class="back"><div class="cam"><i></i><i></i><i></i></div></div></div>
     </div>
   </div>
 </section>
@@ -526,6 +526,11 @@ steps.forEach(function(s){so.observe(s)});
 
 /* ---------- PRO PHONE ---------- */
 document.getElementById('proscreen').insertAdjacentHTML('beforeend',S.pro);
+var pst=document.getElementById('prostage'),pph=document.getElementById('prophone');
+if(window.matchMedia('(pointer:fine)').matches){
+pst.addEventListener('mousemove',function(e){var r=pst.getBoundingClientRect();var x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;pph.style.transform='rotateY('+(-18+x*30)+'deg) rotateX('+(6-y*20)+'deg) rotateZ(4deg)'});
+pst.addEventListener('mouseleave',function(){pph.style.transform='rotateY(-18deg) rotateX(6deg) rotateZ(4deg)'});
+}
 /* ---------- DEMO ---------- */
 var chips=document.querySelectorAll('.chip'),proj='Portail coulissant';
 chips.forEach(function(c){c.addEventListener('click',function(){chips.forEach(function(x){x.classList.remove('on')});c.classList.add('on');proj=c.dataset.p})});
