@@ -214,9 +214,13 @@ h1{font-size:clamp(44px,6.4vw,92px);line-height:.95;letter-spacing:-.045em;font-
 /* pro : flux de demandes en direct */
 .feedbox{border-radius:32px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));padding:26px;min-height:520px;position:relative;overflow:hidden}
 .feedbox .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
-.zone{position:relative;height:210px;border-radius:22px;overflow:hidden;background:#0a1020;border:1px solid var(--line);background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:26px 26px}
+.zone{position:relative;height:240px;border-radius:22px;overflow:hidden;background:#06080f;border:1px solid var(--line)}
+.zone .bgmap{position:absolute;left:0;top:0;width:1600px;height:auto;max-width:none;pointer-events:none;user-select:none;filter:saturate(.55) hue-rotate(190deg) brightness(.9)}
+.zone::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,transparent 35%,rgba(6,8,15,.75) 90%);pointer-events:none}
+.zone .city{position:absolute;left:50%;top:50%;transform:translate(-50%,14px);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#fff;font-weight:800;text-shadow:0 1px 2px #000,0 0 12px rgba(47,128,255,.8);z-index:2}
 .zone .me{position:absolute;left:50%;top:50%;width:14px;height:14px;border-radius:50%;background:#fff;transform:translate(-50%,-50%);box-shadow:0 0 0 5px rgba(255,255,255,.2);z-index:2}
-.zone .rad{position:absolute;left:50%;top:50%;width:var(--r,200px);height:var(--r,200px);border-radius:50%;transform:translate(-50%,-50%);border:1.5px dashed rgba(var(--a-rgb),.6);background:rgba(var(--a-rgb),.08);transition:width .6s var(--ease),height .6s var(--ease)}
+.zone .rad{position:absolute;left:50%;top:50%;width:var(--r,200px);height:var(--r,200px);border-radius:50%;transform:translate(-50%,-50%);border:1.5px dashed rgba(var(--a-rgb),.7);background:rgba(var(--a-rgb),.12);transition:width .6s var(--ease),height .6s var(--ease);z-index:1}
+.zone .pulse,.zone .me,.zone .req,.zone .lbl{z-index:1}
 .zone .pulse{position:absolute;left:50%;top:50%;width:var(--r,200px);height:var(--r,200px);border-radius:50%;transform:translate(-50%,-50%);border:1px solid rgba(var(--a-rgb),.8);animation:ring 2.4s ease-out infinite}
 @keyframes ring{0%{transform:translate(-50%,-50%) scale(.3);opacity:1}100%{transform:translate(-50%,-50%) scale(1.1);opacity:0}}
 .zone .req{position:absolute;width:12px;height:12px;border-radius:50%;background:var(--b);box-shadow:0 0 0 4px rgba(94,225,200,.25);transform:scale(0);transition:transform .5s cubic-bezier(.3,1.5,.5,1)}
@@ -286,7 +290,7 @@ footer .links{display:flex;gap:24px}
 .mapstory{height:380vh;position:relative;z-index:1}
 .mapsticky{position:sticky;top:0;height:100vh;overflow:hidden;z-index:2;pointer-events:none}
 .mapsticky>*{pointer-events:auto}
-.herotext{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);max-width:620px;padding:0 0 0 max(28px,calc((100vw - 1200px)/2 + 28px));transition:opacity .3s;z-index:3}
+.herotext{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);box-sizing:content-box;max-width:600px;padding:0 0 0 max(28px,calc((100vw - 1200px)/2 + 28px));transition:opacity .3s;z-index:3}
 .herotext h1{text-align:left;margin:26px 0 20px;font-size:clamp(42px,5.6vw,78px)}
 .herotext .lead{margin:0 0 30px;text-align:left}
 .hint{margin-top:26px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:inline-flex;gap:10px;align-items:center}
@@ -498,7 +502,8 @@ footer .links{display:flex;gap:24px}
       <div class="feedbox rv d1">
         <div class="top"><b>Demandes autour de Lyon</b><span class="pill blue" id="rqcount" style="font-size:9px">En direct</span></div>
         <div class="zone" id="zone">
-          <div class="rad"></div><div class="pulse"></div><div class="me"></div>
+          <img class="bgmap" id="bgmap" src="nightmap.jpg" alt="" draggable="false">
+          <div class="rad"></div><span class="city">Lyon</span><div class="pulse"></div><div class="me"></div>
           <div class="req" style="left:38%;top:36%"></div><div class="req" style="left:64%;top:30%"></div><div class="req" style="left:58%;top:70%"></div><div class="req" style="left:30%;top:66%"></div><div class="req" style="left:80%;top:56%"></div><div class="req" style="left:16%;top:30%"></div>
           <span class="lbl">Rayon d'intervention</span>
         </div>
@@ -664,7 +669,9 @@ var zone=document.getElementById('zone'),rad=document.getElementById('rad'),radv
 var R=[['Portail coulissant alu 4 m','Villeurbanne · 6 km · motorisation','1 290 €',6],['Clôture alu 18 ml','Bron · 9 km · sur muret','1 850 €',9],['6 fenêtres PVC','Caluire · 12 km','2 140 €',12],['Volets roulants x4','Lyon 3e · 14 km','980 €',14],['Pergola bioclimatique','Meyzieu · 22 km','2 460 €',22],['Porte de garage sectionnelle','Vienne · 31 km','1 640 €',31]];
 R.forEach(function(x,i){var d=document.createElement('div');d.className='rq';d.innerHTML='<span class="av" style="background:'+['#2f80ff','#1b2a4a','#5ee1c8','#2f80ff','#1b2a4a','#5ee1c8'][i]+';color:#fff">'+(i+1)+'</span><div><div class="nm">'+x[0]+' <span class="new">Nouveau</span></div><div class="mt">'+x[1]+'</div></div><div class="pr"><b>'+x[2]+'</b><span>estimation</span></div>';d._km=x[3];reqs.appendChild(d)});
 var dots=zone.querySelectorAll('.req'),cards=reqs.querySelectorAll('.rq');
-function updZone(){var km=+rad.value;radv.textContent=km+' km';var px=Math.round(60+km*2.6);zone.style.setProperty('--r',px+'px');var n=0;
+var bgm=document.getElementById('bgmap');function centerMap(){var w=zone.clientWidth,hh=zone.clientHeight,bw=1600,bh=1600*1010/1050;bgm.style.left=(w/2-.6729*bw)+'px';bgm.style.top=(hh/2-.5584*bh)+'px'}
+window.addEventListener('resize',centerMap);centerMap();
+function updZone(){centerMap();var km=+rad.value;radv.textContent=km+' km';var px=Math.round(60+km*2.6);zone.style.setProperty('--r',px+'px');var n=0;
   cards.forEach(function(c,i){var on=c._km<=km;setTimeout(function(){c.classList.toggle('on',on);dots[i].classList.toggle('on',on)},i*90);if(on)n++});
   rqc.textContent=n+' demande'+(n>1?'s':'')+' dans votre rayon';}
 rad.addEventListener('input',updZone);
