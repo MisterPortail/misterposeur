@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mister Poseur — Un poseur vérifié, près de chez vous</title>
+<meta name="description" content="Mister Poseur : trouvez un poseur vérifié, comparez des devis et suivez votre chantier. Portails, fenêtres, volets. Bientôt sur iPhone et Android.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#050506;--bg2:#0b0c0f;--ink:#f6f3ee;--muted:#9a9790;--line:rgba(255,255,255,.08);
+  --orange:#f26b3a;--orange2:#f9a03f;--navy:#1b2a4a;--cream:#faf8f3;
+  --grad:linear-gradient(135deg,#f26b3a 0%,#f9a03f 100%);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;overflow-x:clip}
+body{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:clip;line-height:1.5;max-width:100vw;position:relative}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1200px;margin:0 auto;padding:0 28px}
+::selection{background:var(--orange);color:#fff}
+
+/* grain */
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:999;opacity:.045;mix-blend-mode:screen;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:16px 0;transition:.3s;border-bottom:1px solid transparent}
+nav.scrolled{background:rgba(5,5,6,.7);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-color:var(--line)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:14px;font-weight:900;letter-spacing:.02em;font-size:17px}
+.mark{width:46px;height:46px;border-radius:12px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.35);display:block}.mark img{width:100%;height:100%;display:block}
+.navlinks{display:flex;gap:32px;font-size:14px;font-weight:500;color:var(--muted)}
+.navlinks a:hover{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:13px 22px;border-radius:999px;font-weight:700;font-size:14px;border:0;transition:transform .2s,box-shadow .2s;will-change:transform}
+.btn-primary{background:var(--grad);color:#fff;box-shadow:0 10px 30px rgba(242,107,58,.35)}
+.btn-ghost{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--ink)}
+@media(max-width:860px){.navlinks{display:none}.brand{white-space:nowrap;font-size:14px}nav .btn{padding:10px 16px;font-size:13px;white-space:nowrap}}
+
+/* store buttons */
+.stores{display:flex;gap:14px;flex-wrap:wrap}
+.store{display:flex;align-items:center;gap:12px;padding:12px 22px 12px 16px;border-radius:14px;background:#fff;color:#0a0a0a;min-width:190px;transition:transform .2s,box-shadow .2s;box-shadow:0 10px 30px rgba(0,0,0,.4);will-change:transform}
+.store svg{width:26px;height:26px;flex:none}
+.store small{display:block;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;opacity:.6;line-height:1}
+.store b{display:block;font-size:16px;font-weight:800;line-height:1.15;margin-top:3px}
+.store.dark{background:#141418;color:#fff;border:1px solid rgba(255,255,255,.12)}
+.sb{display:inline-block;transition:transform .2s}.sb:hover{transform:translateY(-3px)}.sb img{height:56px;width:auto;display:block}
+@media(max-width:980px){.stores{flex-wrap:nowrap;gap:10px}.sb{flex:1 1 0;min-width:0}.sb img{height:auto;width:100%;max-height:56px;object-fit:contain}}.sb .store{display:none}.sb.fb img{display:none}.sb.fb .store{display:flex}
+
+/* ===== HERO ===== */
+.hero{position:relative;padding:150px 0 0;min-height:100vh;overflow:hidden;text-align:center}
+.hero::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(800px 500px at 50% 20%,rgba(242,107,58,.18),transparent 60%)}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 4px rgba(242,107,58,.25)}50%{box-shadow:0 0 0 10px rgba(242,107,58,0)}}
+h1{font-size:clamp(46px,7.4vw,104px);line-height:.95;letter-spacing:-.04em;font-weight:900;margin:28px auto 22px;max-width:1000px}
+.flip{display:inline-grid;text-align:left;vertical-align:top;height:1em;overflow:hidden;position:relative}
+.flip span{grid-area:1/1;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;opacity:0;transform:translateY(110%);transition:transform .6s cubic-bezier(.2,.8,.2,1),opacity .4s}
+.flip span.on{opacity:1;transform:none}
+.flip span.out{opacity:0;transform:translateY(-110%)}
+.lead{font-size:19px;color:var(--muted);max-width:600px;margin:0 auto 34px}
+.lead b{color:var(--ink);font-weight:600}
+.hero .stores{justify-content:center}
+.hint{margin-top:26px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:inline-flex;gap:10px;align-items:center}
+.hint i{width:28px;height:1px;background:var(--muted);display:block}
+
+/* ring */
+.ringwrap{position:relative;height:720px;margin-top:0;perspective:2000px;perspective-origin:50% 50%;user-select:none;-webkit-user-select:none;touch-action:pan-y;cursor:grab;overflow:hidden;contain:paint}.ringwrap:active{cursor:grabbing}
+.ring{position:absolute;left:50%;top:50%;transform-style:preserve-3d;will-change:transform}
+.ring .slot{position:absolute;left:0;top:0;width:0;height:0;transform-style:preserve-3d}
+.ring .slot .phone{transform:translate(-50%,-50%) scale(.74);box-shadow:0 0 0 1.5px #3a3a40,0 40px 80px rgba(0,0,0,.75)}
+.floor{position:absolute;left:50%;bottom:40px;width:1100px;height:260px;transform:translateX(-50%) rotateX(78deg);border-radius:50%;background:radial-gradient(ellipse,rgba(242,107,58,.35),rgba(242,107,58,.05) 45%,transparent 70%);filter:blur(10px);pointer-events:none}
+.hero-fade{position:absolute;left:0;right:0;bottom:0;height:160px;background:linear-gradient(transparent,var(--bg));pointer-events:none}
+
+
+/* ===== MAP STORY ===== */
+.mapstory{height:380vh;position:relative}
+.mapdim{position:absolute;inset:0;background:#050506;opacity:0;pointer-events:none}
+.pins{transition:opacity .3s}
+.mapfixed{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;overflow:hidden;contain:paint;pointer-events:none;background:#050506}
+.mapsticky{position:sticky;top:0;height:100vh;overflow:hidden;z-index:2;pointer-events:none}
+.mapsticky>*{pointer-events:auto}
+.mapstory,.marquee,.appsec{position:relative;z-index:1}
+.marquee{background:rgba(8,9,12,.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.appsec{background:transparent}
+.appsec::after{display:none}
+section.demo,section#why,section#pros,section.cta,footer{position:relative;z-index:1;background-color:var(--bg)}
+section.demo,section#pros{background-color:var(--bg2)}
+.cam{position:absolute;left:0;top:0;height:175vh;aspect-ratio:1050/1010;will-change:transform;backface-visibility:hidden;transform:translate3d(0,0,0)}
+.nightmap{position:absolute;left:0;top:0;width:100%;height:100%;display:block;user-select:none;-webkit-user-select:none;pointer-events:none}50%{opacity:1}}
+.cities span{position:absolute;transform:translate(-50%,14px);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,220,180,.55);font-weight:700;white-space:nowrap;text-shadow:0 0 12px rgba(242,107,58,.6)}
+.vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 64% 50%,transparent 40%,rgba(5,5,6,.7) 85%),linear-gradient(90deg,rgba(5,5,6,.97) 0%,rgba(5,5,6,.82) 36%,transparent 58%),linear-gradient(180deg,rgba(5,5,6,.6),transparent 18%,transparent 85%,rgba(5,5,6,.9))}
+.pins{position:absolute;inset:0}
+.pin{position:absolute;width:0;height:0;pointer-events:none;transition:opacity .4s}
+.pin img{position:absolute;left:0;bottom:0;width:44px;height:auto;transform:translate(-9%,-120vh);opacity:0;filter:drop-shadow(0 10px 12px rgba(0,0,0,.6)) drop-shadow(0 0 14px rgba(242,107,58,.55))}
+.pin.on img{animation:drop .85s cubic-bezier(.25,.9,.3,1.1) forwards}
+@keyframes drop{0%{transform:translate(-9%,-120vh);opacity:0}30%{opacity:1}85%{transform:translate(-9%,8px)}100%{transform:translate(-9%,0);opacity:1}}
+.pin .lbl{position:absolute;top:-56px;left:46px;white-space:nowrap;font-size:12px;color:rgba(255,230,205,.85);text-shadow:0 1px 2px rgba(0,0,0,.9);opacity:0;transform:translateX(-8px);transition:opacity .5s,transform .5s;letter-spacing:.02em}
+.pin .lbl b{display:block;color:#fff;font-size:15px;font-weight:800;letter-spacing:-.01em;text-shadow:0 1px 2px rgba(0,0,0,.9),0 0 18px rgba(242,107,58,.8)}
+.pin .lbl::before{content:"";position:absolute;left:-12px;top:50%;width:8px;height:1px;background:rgba(249,160,63,.8);box-shadow:0 0 8px rgba(249,160,63,.9)}
+.pin.l .lbl{left:auto;right:16px;text-align:right;transform:translateX(8px)}.pin.l .lbl::before{left:auto;right:-12px}
+.pin.on .lbl{opacity:1;transform:none;transition-delay:.7s}
+.herotext{position:absolute;left:0;top:50%;transform:translateY(-50%);width:calc(min(640px,48vw) + max(28px,calc((100vw - 1200px)/2 + 28px)));padding:0 0 0 max(28px,calc((100vw - 1200px)/2 + 28px));transition:opacity .3s;z-index:3}
+.herotext h1{text-align:left;margin:22px 0 18px;font-size:clamp(36px,min(5.4vw,8.5vh),78px)}
+.herotext .lead{margin:0 0 26px;text-align:left;font-size:clamp(15px,2.2vh,19px)}
+.herotext .stores{justify-content:flex-start}
+.stepcards{position:absolute;left:0;top:50%;transform:translateY(-50%);max-width:520px;z-index:3;pointer-events:none}
+.stc{position:absolute;left:max(28px,calc((100vw - 1200px)/2 + 28px));top:0;transform:translateY(calc(-50% + 30px));width:min(480px,80vw);opacity:0;transition:opacity .5s,transform .6s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+.stc.on{opacity:1;transform:translateY(-50%);pointer-events:auto}
+.stc h3{font-size:clamp(28px,3.4vw,44px);letter-spacing:-.03em;font-weight:900;line-height:1.05;margin:4px 0 14px}
+.stc p{color:var(--muted);font-size:17px}
+.counter{position:absolute;right:max(28px,calc((100vw - 1200px)/2 + 28px));bottom:34px;display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:18px;background:rgba(10,11,14,.6);backdrop-filter:blur(12px);border:1px solid var(--line);z-index:3;color:var(--muted);font-size:12px;line-height:1.3}
+.counter b{font-size:34px;font-weight:900;letter-spacing:-.03em;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:tabular-nums}
+.region{position:absolute;right:max(28px,calc((100vw - 1200px)/2 + 28px));top:96px;z-index:3;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,220,180,.6);display:flex;align-items:center;gap:10px}
+.region i{width:6px;height:6px;border-radius:50%;background:var(--orange);box-shadow:0 0 10px var(--orange);animation:pulse 2s infinite}
+.appsec{padding:120px 0 0;overflow:hidden;position:relative}
+
+.appsec .ringwrap{margin-top:20px}
+.appsec::after{content:"";position:absolute;left:0;right:0;bottom:0;height:160px;background:linear-gradient(transparent,var(--bg));pointer-events:none}
+@media(max-width:980px){
+  .mapstory{height:340vh}
+  .cam{height:135vh}
+  .vignette{background:linear-gradient(180deg,rgba(5,5,6,.75),transparent 16%,transparent 34%,rgba(5,5,6,.9) 52%,#050506 68%)}
+  .herotext{top:auto;bottom:0;transform:none;padding:0 22px 40px;max-width:none;width:100%}
+  .herotext h1{font-size:clamp(36px,10vw,56px)}
+  .stepcards{top:auto;bottom:0;transform:none;padding:0}
+  .stc{left:22px;top:auto;bottom:40px;transform:translateY(20px)}
+  .stc.on{transform:none}
+  .counter{right:16px;left:auto;bottom:auto;top:84px;padding:10px 12px}.counter b{font-size:24px}
+  .region{display:none}
+  .pin img{width:34px}.pin .lbl{top:-46px;left:36px}.pin .lbl b{font-size:13px}.pin .lbl{font-size:11px}
+}
+
+
+/* 3D thickness */
+.ring .phone{box-shadow:none;background:#141418;border:1.5px solid #3a3a40}
+.ring .phone .screen{transform:translateZ(.6px)}
+.ring .phone .edge{position:absolute;inset:-1.5px;border-radius:44px;background:linear-gradient(90deg,#2a2a30,#4a4a52 50%,#2a2a30);display:block;backface-visibility:visible}
+.ring .phone .back{transform:rotateY(180deg) translateZ(12.5px);background:linear-gradient(160deg,#23232a,#0e0e12);box-shadow:inset 0 0 0 1.5px #3a3a40}
+.ring .phone::before,.ring .phone::after,.ring .phone .side{display:none}
+.ring .slot::after{content:"";position:absolute;left:50%;top:50%;width:200px;height:420px;transform:translate(-50%,-30%) translateZ(-20px);background:radial-gradient(ellipse at 50% 100%,rgba(0,0,0,.6),transparent 70%);filter:blur(10px);pointer-events:none}
+.ringwrap{perspective:1700px}
+.floor{bottom:10px;width:1200px;height:300px;background:radial-gradient(ellipse,rgba(242,107,58,.45),rgba(242,107,58,.08) 45%,transparent 70%)}
+
+/* ===== PHONE ===== */
+.phone{width:272px;height:566px;border-radius:44px;background:#0b0b0d;padding:9px;position:relative;transform-style:preserve-3d;
+  box-shadow:0 0 0 1.5px #2a2a2e,0 0 0 3px #0a0a0a,0 30px 80px rgba(0,0,0,.7)}
+.phone .screen{width:100%;height:100%;border-radius:36px;overflow:hidden;background:#1c1b2e;color:var(--navy);position:relative;font-size:11px;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.phone .shot{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.phone .back{position:absolute;inset:0;border-radius:44px;background:linear-gradient(160deg,#1c1c21,#0c0c0f);transform:rotateY(180deg);backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:inset 0 0 0 1.5px #2a2a2e}
+.phone .edge{position:absolute;inset:0;border-radius:44px;background:#1c1c20;box-shadow:inset 0 0 0 1px #26262b}
+.orbit{position:absolute;left:50%;top:50%;border-radius:50%;border:1.5px solid rgba(242,107,58,.5);box-shadow:0 0 30px rgba(242,107,58,.5);transform:translate(-50%,-50%) translateY(238px) rotateX(90deg);pointer-events:none}
+.orbit::after{content:"";position:absolute;inset:-40px;border-radius:50%;border:1px dashed rgba(255,255,255,.08)}
+.phone .back .cam{position:absolute;top:18px;left:18px;width:86px;height:86px;border-radius:26px;background:#17171b;box-shadow:inset 0 0 0 1px #2d2d33}
+.phone .back .cam i{position:absolute;width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#3a3a44,#0a0a0c 70%);box-shadow:0 0 0 3px #222}
+.phone .back .cam i:nth-child(1){left:10px;top:10px}.phone .back .cam i:nth-child(2){left:46px;top:10px}.phone .back .cam i:nth-child(3){left:10px;top:46px}
+.phone .back .lg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:16px;overflow:hidden;opacity:.9}.phone .back .lg img{width:100%;height:100%;display:block}
+.island{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:82px;height:24px;background:#000;border-radius:20px;z-index:5}
+.status{display:flex;justify-content:space-between;padding:14px 22px 0;font-size:11px;font-weight:700}
+.sc{padding:10px 16px 0}
+.reflect{position:absolute;inset:0;border-radius:36px;pointer-events:none;background:linear-gradient(115deg,rgba(255,255,255,.16),rgba(255,255,255,0) 32%);z-index:4}
+.homebar{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:100px;height:4px;border-radius:4px;background:#111;z-index:5}
+/* app ui */
+.pill{display:inline-block;padding:5px 10px;border-radius:999px;font-size:8.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.pill.grey{background:#e9e5dc;color:#6b6760}.pill.or{background:#fdebe2;color:var(--orange)}.pill.green{background:#e3f4ea;color:#1f8a4c}
+.abtn{display:flex;align-items:center;justify-content:center;gap:8px;border-radius:14px;padding:13px;font-weight:800;font-size:11.5px;letter-spacing:.02em;text-transform:uppercase}
+.abtn.navy{background:var(--navy);color:#fff}.abtn.line{border:1.5px solid #dcd6ca;color:var(--navy);background:#fff}.abtn.or{background:var(--grad);color:#fff}
+.card{background:#fff;border:1px solid #ebe6dc;border-radius:16px;padding:12px}
+.row{display:flex;align-items:center;gap:10px}
+.av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:800;color:#fff;font-size:12px;flex:none}
+.h{font-weight:800;font-size:13px;letter-spacing:-.01em}.s{color:#7b776f;font-size:9.5px}
+.badge{display:inline-flex;align-items:center;gap:3px;background:#e3f4ea;color:#1f8a4c;font-size:8px;font-weight:800;padding:2px 6px;border-radius:999px;text-transform:uppercase;letter-spacing:.06em}
+.tabbar{position:absolute;bottom:0;left:0;right:0;height:60px;background:#fff;border-top:1px solid #ebe6dc;display:flex;justify-content:space-around;align-items:center;padding:0 10px 10px;font-size:8px;font-weight:700;color:#9a958b}
+.tabbar div{display:flex;flex-direction:column;align-items:center;gap:3px}.tabbar .on{color:var(--orange)}.tabbar i{width:18px;height:18px;border-radius:6px;background:currentColor;display:block}
+
+/* ===== SECTIONS ===== */
+section{padding:120px 0;position:relative}
+.kicker{color:var(--orange);font-weight:800;font-size:12px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:16px;display:block}
+h2{font-size:clamp(34px,4.8vw,60px);line-height:1;letter-spacing:-.035em;font-weight:900}
+.sub{color:var(--muted);font-size:18px;margin-top:18px;max-width:600px}
+
+/* marquee */
+.marquee{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:20px 0;overflow:hidden;contain:paint;background:var(--bg2)}
+.track{display:flex;gap:56px;white-space:nowrap;animation:mq 32s linear infinite;width:max-content}
+.track span{font-weight:800;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:56px}
+.track span::after{content:"•";color:var(--orange)}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+/* ===== SCROLLYTELLING ===== */
+.story .wrap{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start}
+.sticky{position:sticky;top:90px;height:calc(100vh - 110px);min-height:640px;display:grid;place-items:center;perspective:1400px}
+.sticky .phone{transition:transform .9s cubic-bezier(.2,.8,.2,1);transform:rotateY(-14deg) rotateX(4deg)}
+.sticky .phone .scr{position:absolute;inset:0;opacity:0;transition:opacity .5s,transform .6s;transform:scale(1.03)}
+.sticky .phone .scr.on{opacity:1;transform:none}
+.sticky .glow{position:absolute;left:50%;top:50%;width:520px;height:520px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(242,107,58,.3),transparent 60%);filter:blur(30px);pointer-events:none}
+.sticky .progress{position:absolute;left:0;top:50%;transform:translateY(-50%);display:grid;gap:14px}
+.sticky .progress i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.15);display:block;transition:.3s}
+.sticky .progress i.on{background:var(--orange);box-shadow:0 0 0 5px rgba(242,107,58,.2);transform:scale(1.3)}
+.stepsx{padding:12vh 0 20vh}
+.stp{min-height:72vh;display:flex;flex-direction:column;justify-content:center;opacity:.25;transition:opacity .5s;padding-right:20px}
+.stp.on{opacity:1}
+.stp .n{font-family:'Space Grotesk',sans-serif;font-size:72px;font-weight:700;line-height:1;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:-.04em}
+.stp h3{font-size:clamp(28px,3.4vw,42px);letter-spacing:-.03em;font-weight:900;margin:14px 0 14px;line-height:1.05}
+.stp p{color:var(--muted);font-size:17px;max-width:460px}
+.stp .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}
+.stp .tags span{padding:7px 12px;border-radius:999px;border:1px solid var(--line);font-size:12px;font-weight:600;color:#d6d2ca;background:rgba(255,255,255,.03)}
+
+/* ===== DEMO ===== */
+.demo{background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.demo .wrap{display:grid;grid-template-columns:1fr 1.1fr;gap:60px;align-items:center}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin:26px 0 14px}
+.chip{padding:12px 18px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);font-weight:700;font-size:14px;transition:.2s;user-select:none}
+.chip.on{background:var(--grad);border-color:transparent;color:#fff;box-shadow:0 8px 24px rgba(242,107,58,.35)}
+.field{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
+.field input{flex:1 1 200px;min-width:0;padding:16px 18px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink);font:inherit;font-size:16px;outline:none;transition:.2s}
+.field input:focus{border-color:rgba(242,107,58,.7);box-shadow:0 0 0 4px rgba(242,107,58,.15)}
+.field button{padding:16px 24px;border-radius:16px;border:0;background:var(--grad);color:#fff;font:inherit;font-weight:800;font-size:15px;box-shadow:0 10px 30px rgba(242,107,58,.35)}
+.demo-note{font-size:12px;color:var(--muted);margin-top:14px}
+.panel{position:relative;border-radius:32px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));padding:26px;min-height:520px;overflow:hidden}
+.panel .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.panel .top b{font-size:15px}
+.radar{position:relative;height:230px;border-radius:22px;overflow:hidden;background:#0d0f14;border:1px solid var(--line);
+  background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:26px 26px}
+.rmap{position:absolute;inset:0;background:#0d0f14 url(nightmap.jpg) no-repeat;background-size:400% auto;background-position:50% 48%;opacity:.95;transition:background-position .9s cubic-bezier(.2,.8,.2,1)}
+.rfade{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,transparent 45%,rgba(13,15,20,.75) 100%)}
+.rcity{position:absolute;left:12px;top:10px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,220,180,.85);font-weight:800;text-shadow:0 1px 2px #000}
+.radar .sweep{position:absolute;left:50%;top:50%;width:600px;height:600px;transform:translate(-50%,-50%);border-radius:50%;background:conic-gradient(from 0deg,rgba(242,107,58,.0) 0deg,rgba(242,107,58,.45) 40deg,transparent 60deg);animation:sweep 2.2s linear infinite;opacity:0;transition:opacity .4s}
+.radar.on .sweep{opacity:1}
+@keyframes sweep{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.radar .ringz{position:absolute;left:50%;top:50%;border-radius:50%;border:1px solid rgba(242,107,58,.25);transform:translate(-50%,-50%)}
+.radar .me{position:absolute;left:50%;top:50%;width:14px;height:14px;border-radius:50%;background:#fff;transform:translate(-50%,-50%);box-shadow:0 0 0 5px rgba(255,255,255,.2)}
+.radar .pin{position:absolute;width:30px;height:30px;transform:translate(-50%,-100%) scale(0);transition:transform .5s cubic-bezier(.3,1.5,.5,1)}
+.radar .pin.on{transform:translate(-50%,-100%) scale(1)}
+.radar .pin b{position:absolute;left:50%;top:-18px;transform:translateX(-50%);white-space:nowrap;font-size:10px;font-weight:800;background:#fff;color:#111;padding:3px 7px;border-radius:999px}
+.res{display:grid;gap:10px;margin-top:16px}
+.rc{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:18px;background:rgba(255,255,255,.05);border:1px solid var(--line);opacity:0;transform:translateY(14px);transition:.5s}
+.rc.on{opacity:1;transform:none}
+.rc .av{width:40px;height:40px;font-size:13px}
+.rc .nm{font-weight:800;font-size:14px}.rc .mt{color:var(--muted);font-size:12px}
+.rc .pr{margin-left:auto;text-align:right}.rc .pr b{font-size:20px;font-weight:900;letter-spacing:-.02em;display:block;font-variant-numeric:tabular-nums}.rc .pr span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.rc.best{border-color:rgba(242,107,58,.6);background:rgba(242,107,58,.08)}
+.empty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:var(--muted);font-size:15px;padding:40px;transition:opacity .4s}
+.empty.off{opacity:0;pointer-events:none}
+
+/* ===== BENTO ===== */
+.bento{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}
+.cell{border:1px solid var(--line);border-radius:28px;padding:32px;background:rgba(255,255,255,.025);position:relative;overflow:hidden;transition:.3s}
+.cell:hover{border-color:rgba(242,107,58,.5);transform:translateY(-4px)}
+.cell h3{font-size:21px;font-weight:800;letter-spacing:-.02em;margin:18px 0 8px}.cell p{color:var(--muted);font-size:15px}
+.cell .ic{width:46px;height:46px;border-radius:14px;background:var(--grad);display:grid;place-items:center;box-shadow:0 8px 24px rgba(242,107,58,.35)}
+.c4{grid-column:span 4}.c6{grid-column:span 6}.c8{grid-column:span 8}
+.cell.big{min-height:340px;display:flex;flex-direction:column;justify-content:flex-end}
+.cell.big .num{font-size:92px;font-weight:900;letter-spacing:-.05em;line-height:1;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* ===== AVANT / APRÈS ===== */
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:40px}
+.ba .col{border-radius:28px;padding:34px;border:1px solid var(--line);position:relative;overflow:hidden}
+.ba .col.bad{background:rgba(255,255,255,.02)}
+.ba .col.good{background:linear-gradient(180deg,rgba(242,107,58,.14),rgba(242,107,58,.03));border-color:rgba(242,107,58,.4)}
+.ba h4{font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--muted);margin-bottom:18px}
+.ba .good h4{color:var(--orange)}
+.ba ul{list-style:none;display:grid;gap:14px}
+.ba li{display:flex;gap:12px;font-size:16px;color:#d6d2ca;align-items:flex-start}
+.ba li i{width:22px;height:22px;border-radius:50%;flex:none;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:900;margin-top:2px}
+.ba .bad li i{background:rgba(255,255,255,.08);color:#999}.ba .good li i{background:var(--grad);color:#fff}
+.ba .bad li{text-decoration:line-through;text-decoration-color:rgba(255,255,255,.25);color:#8a877f}
+
+/* ===== LIVE FEED ===== */
+.feed{position:fixed;left:20px;bottom:20px;z-index:60;display:grid;gap:10px;pointer-events:none}
+.toast{display:flex;align-items:center;gap:12px;padding:12px 16px 12px 12px;border-radius:16px;background:rgba(14,15,18,.85);backdrop-filter:blur(14px);border:1px solid var(--line);box-shadow:0 20px 50px rgba(0,0,0,.5);font-size:13px;transform:translateX(-120%);opacity:0;transition:.6s cubic-bezier(.2,.8,.2,1);max-width:340px}
+.toast.on{transform:none;opacity:1}
+.toast .av{width:34px;height:34px;font-size:11px}
+.toast b{display:block;font-size:13px}.toast span{color:var(--muted);font-size:11.5px}
+.toast .live{margin-left:auto;font-size:9px;letter-spacing:.12em;color:var(--orange);font-weight:800;display:flex;align-items:center;gap:5px}
+.toast .live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--orange);animation:pulse 1.5s infinite}
+@media(max-width:700px){.feed{display:none}}
+
+/* ===== CTA ===== */
+.cta{text-align:center;padding:160px 0 120px;overflow:hidden}
+.cta-glow{position:absolute;left:50%;top:45%;width:1000px;height:700px;transform:translate(-50%,-50%);background:radial-gradient(ellipse,rgba(242,107,58,.28),transparent 60%);filter:blur(40px);pointer-events:none}
+.cta h2{font-size:clamp(44px,7vw,96px);letter-spacing:-.045em}
+.cta .stores{justify-content:center;margin-top:40px}
+.cta .wrap{position:relative}
+footer{border-top:1px solid var(--line);padding:40px 0;color:var(--muted);font-size:13px}
+footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+footer .links{display:flex;gap:24px}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(28px);transition:opacity .8s cubic-bezier(.2,.8,.2,1),transform .8s cubic-bezier(.2,.8,.2,1)}
+.rv.in{opacity:1;transform:none}.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
+
+@media(max-width:980px){
+  .story .wrap{grid-template-columns:1fr}
+  .story{padding-top:40px}
+  .sticky{position:sticky;top:62px;height:380px;min-height:0;z-index:2;margin:0 -28px;background:linear-gradient(180deg,var(--bg) 0,var(--bg) 88%,transparent);perspective:1000px}
+  .sticky .phone{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.58)!important;transform-origin:center center}
+  .sticky .glow{width:300px;height:300px}
+  .sticky .progress{display:flex;flex-direction:row;left:50%;top:auto;bottom:14px;transform:translateX(-50%);gap:10px}
+  .stepsx{padding:10px 0 20vh}
+  .stp{min-height:62vh;padding:20px 0;opacity:.3}
+  .stp.on{opacity:1}
+  .stp .n{font-size:48px}
+  #proswrap{grid-template-columns:1fr!important}#prostage{height:560px!important}#prophone{transform:rotateY(-12deg) rotateX(4deg) rotateZ(2deg) scale(.85)!important}
+  .demo .wrap{grid-template-columns:1fr;min-width:0}.field button{flex:1 1 100%}.panel{min-width:0}
+  .c4,.c6,.c8{grid-column:span 12}
+  .ba{grid-template-columns:1fr}
+  .ringwrap{height:520px;perspective:1400px;perspective-origin:50% 47%}
+  .ring{top:47%}
+  .ring .slot .phone{transform:translate(-50%,-50%) scale(.52);box-shadow:0 0 0 1.5px #3a3a40,0 30px 60px rgba(0,0,0,.7)}
+  .orbit{transform:translate(-50%,-50%) translateY(160px) rotateX(90deg)}
+  .floor{width:700px;height:180px}
+  section{padding:90px 0}
+}
+@media(max-width:560px){.ringwrap{height:480px}.ring .slot .phone{transform:translate(-50%,-50%) scale(.5)!important}.orbit{transform:translate(-50%,-50%) translateY(150px) rotateX(90deg)}.hero{padding-top:120px}}
+</style>
+</head>
+<body>
+
+<nav id="nav"><div class="wrap">
+  <a href="#" class="brand"><span class="mark"><img src="../logo.png" alt="Mister Poseur"></span>MISTER POSEUR</a>
+  <div class="navlinks"><a href="#story">L'app</a><a href="#demo">Essayer</a><a href="#why">Pourquoi</a><a href="#pros">Poseurs</a></div>
+  <a href="#telecharger" class="btn btn-primary mag">Télécharger l'app</a>
+</div></nav>
+
+<div class="mapfixed" id="mapfixed"><div class="cam" id="cam">
+      <img class="nightmap" src="../nightmap.jpg" alt="" draggable="false">
+      
+      <div class="pins" id="pins"><div class="pin r" style="left:40.02%;top:39.7%"><img src="../pin.png" alt=""><span class="lbl"><b>Loire Menuiserie</b>Tours</span></div><div class="pin l" style="left:68.61%;top:40.4%"><img src="../pin.png" alt=""><span class="lbl"><b>Bourgogne Portails</b>Dijon</span></div><div class="pin r" style="left:55.79%;top:55.64%"><img src="../pin.png" alt=""><span class="lbl"><b>Auvergne Alu</b>Clermont-Ferrand</span></div><div class="pin r" style="left:44.95%;top:77.23%"><img src="../pin.png" alt=""><span class="lbl"><b>ARBAT</b>Toulouse</span></div><div class="pin r" style="left:60.98%;top:77.13%"><img src="../pin.png" alt=""><span class="lbl"><b>Occitane Pose</b>Montpellier</span></div><div class="pin r" style="left:67.29%;top:55.84%" data-i="1"><img src="../pin.png" alt=""><span class="lbl"><b>Art Bâtiment</b>Lyon</span></div><div class="pin r" style="left:25.3%;top:41.39%" data-i="2"><img src="../pin.png" alt=""><span class="lbl"><b>François Bâtiment</b>Nantes</span></div><div class="pin l" style="left:55.59%;top:7.62%" data-i="3"><img src="../pin.png" alt=""><span class="lbl"><b>Menuiserie Lefèvre</b>Lille</span></div><div class="pin r" style="left:31.67%;top:64.95%" data-i="4"><img src="../pin.png" alt=""><span class="lbl"><b>Alu Pose 33</b>Bordeaux</span></div><div class="pin l" style="left:70.77%;top:80.2%" data-i="6"><img src="../pin.png" alt=""><span class="lbl"><b>Portails du Sud</b>Marseille</span></div><div class="pin r" style="left:50.93%;top:25.15%" data-i="8"><img src="../pin.png" alt=""><span class="lbl"><b>Atelier Morel</b>Paris</span></div></div>
+    </div>
+    <div class="vignette"></div><div class="mapdim" id="mapdim"></div></div>
+<header class="mapstory" id="top">
+  <div class="mapsticky">
+    
+    <div class="region"><i></i><span id="regname">Bretagne · Normandie · Île-de-France</span></div>
+    <div class="herotext" id="herotext">
+      <span class="eyebrow"><span class="dot"></span> Bientôt disponible · iOS & Android</span>
+      <h1>Un poseur <span class="flip" id="flip"><span class="on">vérifié,</span><span>assuré,</span><span>noté,</span><span>local,</span></span><br>près de chez vous.</h1>
+      <p class="lead">Portails, fenêtres, volets. Décrivez votre projet, recevez des devis de <b>professionnels contrôlés</b>, comparez et suivez votre chantier — depuis votre poche.</p>
+      <div class="stores">
+        <a class="sb" href="#telecharger" aria-label="Télécharger dans l'App Store"><img src="../badges/app-store.png" alt="Télécharger dans l'App Store" onerror="this.parentNode.classList.add('fb')"><span class="store dark"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="2" width="14" height="20" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v7m0 0-2.5-2.5M12 14l2.5-2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span><small>Télécharger sur</small><b>App Store</b></span></span></a>
+        <a class="sb" href="#telecharger" aria-label="Disponible sur Google Play"><img src="../badges/google-play.png" alt="Disponible sur Google Play" onerror="this.parentNode.classList.add('fb')"><span class="store"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="2" width="14" height="20" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v7m0 0-2.5-2.5M12 14l2.5-2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span><small>Disponible sur</small><b>Google Play</b></span></span></a>
+      </div>
+      <div class="hint"><i></i> Faites défiler <i></i></div>
+    </div>
+    <div class="stepcards">
+      <div class="stc" data-from="0.1" data-to="0.4"><span class="kicker">Partout en France</span><h3>Un réseau de poseurs, région par région.</h3><p>Chaque épingle est un professionnel du portail, de la fenêtre ou du volet, recruté dans sa zone.</p></div>
+      <div class="stc" data-from="0.4" data-to="0.68"><span class="kicker">Vérifiés un par un</span><h3>Identité, SIRET, assurance décennale, avis.</h3><p>Aucun poseur n'apparaît sur la carte sans avoir passé le contrôle. C'est la règle.</p></div>
+      <div class="stc" data-from="0.68" data-to="1.01"><span class="kicker">Près de chez vous</span><h3>Le bon poseur est à quelques kilomètres.</h3><p>Vous décrivez votre projet, les poseurs vérifiés de votre zone vous répondent. Zéro démarchage.</p><a href="#app" class="btn btn-primary mag" style="margin-top:22px">Découvrir l'application</a></div>
+    </div>
+    <div class="counter" id="counter"><b id="cnt">0</b><span>poseurs vérifiés<br>sur la carte</span></div>
+  </div>
+</header>
+
+<section class="appsec" id="app">
+  <div class="wrap" style="text-align:center">
+    <span class="kicker rv">L'application</span>
+    <h2 class="rv">Tout le chantier dans votre poche.</h2>
+    <p class="sub rv d1" style="margin:18px auto 0">Trouver, comparer, échanger, suivre. Une seule app.</p>
+    <div class="hint rv d2" style="margin-top:22px"><i></i> Faites tourner les téléphones <i></i></div>
+    
+  </div>
+  <div class="ringwrap" id="ringwrap"><div class="floor"></div><div class="ring" id="ring"></div></div>
+</section>
+
+
+<div class="marquee"><div class="track" id="track"><span>Portails</span><span>Clôtures</span><span>Pergolas</span><span>Carports</span><span>Fenêtres</span><span>Volets</span><span>Portes d'entrée</span><span>Portes de garage</span><span>Menuiseries</span><span>Cuisine</span><span>Carrelage</span><span>Parquet</span></div></div>
+
+<!-- ===== STORY ===== -->
+<section class="story" id="story">
+  <div class="wrap">
+    <div class="sticky" id="sticky">
+      <div class="glow"></div>
+      <div class="progress" id="prog"><i class="on"></i><i></i><i></i><i></i></div>
+      <div class="phone" id="storyphone"><div class="screen" id="storyscreen"><div class="island"></div><div class="reflect"></div></div><div class="back"><div class="cam"><i></i><i></i><i></i></div><div class="lg"><img src="../logo.png" alt=""></div></div></div>
+    </div>
+    <div class="stepsx">
+      <div class="stp on" data-screen="form" data-rot="rotateY(-14deg) rotateX(4deg)"><div class="n">01</div><h3>Décrivez votre projet en deux minutes.</h3><p>Type de portail, dimensions, deux photos, votre code postal. Pas de compte à créer, pas de mot de passe : un code à 6 chiffres suffit.</p><div class="tags"><span>Sans mot de passe</span><span>Photos</span><span>2 min</span></div></div>
+      <div class="stp" data-screen="search" data-rot="rotateY(16deg) rotateX(-3deg) rotateZ(-2deg)"><div class="n">02</div><h3>Les poseurs vérifiés de votre zone sont alertés.</h3><p>Seuls des professionnels contrôlés — identité, SIRET, assurance décennale, avis — voient votre demande. Vous ne recevez aucun appel.</p><div class="tags"><span>SIRET</span><span>Décennale</span><span>Avis vérifiés</span><span>Zéro démarchage</span></div></div>
+      <div class="stp" data-screen="devis" data-rot="rotateY(-10deg) rotateX(6deg) rotateZ(2deg)"><div class="n">03</div><h3>Comparez des devis qui se comparent vraiment.</h3><p>Même structure pour tous : main-d'œuvre, motorisation, déplacement, fournitures. Un prix fixé à l'avance, pas de surprise le jour J.</p><div class="tags"><span>Prix clair</span><span>Comparaison 1 clic</span></div></div>
+      <div class="stp" data-screen="suivi" data-rot="rotateY(12deg) rotateX(2deg)"><div class="n">04</div><h3>Échangez en direct, suivez votre chantier.</h3><p>Date de pose, messages, photos, documents : tout l'historique au même endroit. Vous traitez directement avec le poseur, Mister Poseur vous met en relation.</p><div class="tags"><span>Contact direct</span><span>Messagerie</span><span>Suivi en direct</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== DEMO ===== -->
+<section class="demo" id="demo">
+  <div class="wrap">
+    <div class="rv">
+      <span class="kicker">Essayez maintenant</span>
+      <h2>Lancez une recherche. Regardez les poseurs arriver.</h2>
+      <p class="sub">Une simulation de ce que fait l'application en quelques secondes, à partir de votre projet et de votre code postal.</p>
+      <div class="chips" id="chips"><span class="chip on" data-p="Portail coulissant">Portail</span><span class="chip" data-p="Clôture alu">Clôture</span><span class="chip" data-p="Fenêtres">Fenêtres</span><span class="chip" data-p="Volets roulants">Volets</span><span class="chip" data-p="Pergola">Pergola</span></div>
+      <div class="field"><input id="cp" type="text" inputmode="numeric" maxlength="5" placeholder="Votre code postal (ex. 69003)"><button id="go">Trouver un poseur</button></div>
+      <p class="demo-note">Démonstration : les poseurs, distances et prix affichés sont fictifs.</p>
+    </div>
+    <div class="panel rv d1">
+      <div class="top"><b id="ptitle">Poseurs autour de vous</b><span class="pill or" id="pcount" style="font-size:9px">En attente</span></div>
+      <div class="radar" id="radar">
+        <div class="rmap" id="rmap"></div><div class="rfade"></div>
+        <div class="sweep"></div>
+        <div class="ringz" style="width:120px;height:120px"></div><div class="ringz" style="width:240px;height:240px"></div><div class="ringz" style="width:360px;height:360px"></div>
+        <div class="me"></div><div class="rcity" id="rcity"></div>
+        <div class="pin" style="left:30%;top:42%"><b>6 km</b><svg width="30" height="30" viewBox="0 0 24 24" fill="#f26b3a"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg></div>
+        <div class="pin" style="left:68%;top:30%"><b>11 km</b><svg width="30" height="30" viewBox="0 0 24 24" fill="#f9a03f"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg></div>
+        <div class="pin" style="left:58%;top:76%"><b>18 km</b><svg width="30" height="30" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg></div>
+      </div>
+      <div class="res" id="res"></div>
+      <div class="empty" id="empty">Choisissez un projet, entrez votre code postal et lancez la recherche.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== WHY ===== -->
+<section id="why">
+  <div class="wrap">
+    <div class="rv" style="max-width:720px;margin-bottom:56px"><span class="kicker">Pourquoi Mister Poseur</span><h2>Pensé par des poseurs, pour les particuliers.</h2><p class="sub">Dix ans de chantiers de portails et de menuiseries, condensés dans une app qui enlève le stress de trouver le bon artisan.</p></div>
+    <div class="bento">
+      <div class="cell c4 big rv"><div class="num" data-count="100">0</div><h3>% de poseurs vérifiés</h3><p>Identité, SIRET, assurance décennale et avis contrôlés avant la première mise en relation.</p></div>
+      <div class="cell c4 rv d1"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h10M4 17h7"/></svg></div><h3>Devis comparables</h3><p>Même structure pour tous : main-d'œuvre, fournitures, déplacement. Vous comparez vraiment.</p></div>
+      <div class="cell c4 rv d2"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M4 12h16M14 6l6 6-6 6"/></svg></div><h3>Mise en relation directe</h3><p>Pas d'intermédiaire dans votre chantier : vous traitez et réglez directement avec le poseur que vous avez choisi.</p></div>
+      <div class="cell c6 rv"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M12 7v5l3 3"/></svg></div><h3>Un chantier, un fil</h3><p>Messages, photos, date de pose, documents : tout l'historique à un seul endroit, sans fouiller ses mails.</p></div>
+      <div class="cell c6 rv d1"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div><h3>Zéro démarchage</h3><p>Pas d'appels, pas de revente de contact. Vous contactez les poseurs, pas l'inverse.</p></div>
+    </div>
+
+    <div class="rv" style="margin-top:110px;max-width:720px"><span class="kicker">Avant / après</span><h2>Trouver un poseur, avant et avec Mister Poseur.</h2></div>
+    <div class="ba rv d1">
+      <div class="col bad"><h4>Avant</h4><ul><li><i>✕</i>5 sites de devis, 12 appels de démarchage dans la semaine</li><li><i>✕</i>Des devis impossibles à comparer entre eux</li><li><i>✕</i>Aucune idée si l'artisan est assuré</li><li><i>✕</i>Un artisan injoignable une fois le devis signé</li><li><i>✕</i>Le suivi du chantier… par SMS perdus</li></ul></div>
+      <div class="col good"><h4>Avec Mister Poseur</h4><ul><li><i>✓</i>Une demande, des poseurs vérifiés qui vous répondent</li><li><i>✓</i>Des devis au même format, comparés en un clic</li><li><i>✓</i>SIRET, décennale et avis contrôlés avant tout contact</li><li><i>✓</i>Un contact direct avec le poseur, sans intermédiaire</li><li><i>✓</i>Tout le chantier dans un seul fil</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PROS ===== -->
+<section id="pros" style="background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap" style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center" id="proswrap">
+    <div class="rv">
+      <span class="kicker">Vous êtes poseur ?</span>
+      <h2>Des chantiers qualifiés. Zéro prospection.</h2>
+      <p class="sub">Recevez les demandes de votre zone, répondez en trois clics avec un devis structuré, concentrez-vous sur la pose.</p>
+      <ul style="list-style:none;margin-top:28px;display:grid;gap:14px;font-size:16px;color:#d6d2ca">
+        <li>→ Demandes locales déjà qualifiées (type, dimensions, photos, délai)</li>
+        <li>→ Générateur de devis intégré : main-d'œuvre, motorisation, déplacement, fournitures</li>
+        <li>→ Statuts clairs : nouvelle · devis envoyé · acceptée · terminée</li>
+        <li>→ Gratuit au lancement pour les premiers poseurs partenaires</li>
+      </ul>
+      <div style="margin-top:34px;display:flex;gap:14px;flex-wrap:wrap"><a href="#telecharger" class="btn btn-primary mag">Devenir poseur partenaire</a></div>
+    </div>
+    <div class="rv d1" style="position:relative;height:620px;perspective:1400px;display:grid;place-items:center" id="prostage">
+      <div class="glow" style="position:absolute;left:50%;top:50%;width:460px;height:460px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(242,107,58,.3),transparent 60%);filter:blur(30px)"></div>
+      <div class="phone" id="prophone" style="transform:rotateY(-18deg) rotateX(6deg) rotateZ(4deg);transition:transform .2s"><div class="screen" id="proscreen"><div class="island"></div><div class="reflect"></div></div><div class="back"><div class="cam"><i></i><i></i><i></i></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="cta" id="telecharger">
+  <div class="cta-glow"></div>
+  <div class="wrap">
+    <span class="kicker rv">Téléchargez l'application</span>
+    <h2 class="rv">Votre prochain chantier<br>commence <span style="background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent">ici.</span></h2>
+    <p class="sub rv d1" style="margin:18px auto 0">Gratuit pour les particuliers. Bientôt sur iPhone et Android.</p>
+    <div class="stores rv d2">
+      <a class="sb" href="#telecharger" aria-label="Télécharger dans l'App Store"><img src="../badges/app-store.png" alt="Télécharger dans l'App Store" onerror="this.parentNode.classList.add('fb')"><span class="store dark"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="2" width="14" height="20" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v7m0 0-2.5-2.5M12 14l2.5-2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span><small>Télécharger sur</small><b>App Store</b></span></span></a>
+      <a class="sb" href="#telecharger" aria-label="Disponible sur Google Play"><img src="../badges/google-play.png" alt="Disponible sur Google Play" onerror="this.parentNode.classList.add('fb')"><span class="store"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="2" width="14" height="20" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v7m0 0-2.5-2.5M12 14l2.5-2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span><small>Disponible sur</small><b>Google Play</b></span></span></a>
+    </div>
+  </div>
+</section>
+
+<footer><div class="wrap">
+  <div class="brand" style="font-size:14px"><span class="mark" style="width:34px;height:34px;border-radius:9px"><img src="../logo.png" alt="Mister Poseur"></span>MISTER POSEUR</div>
+  <div class="links"><a href="#">CGU</a><a href="#">Confidentialité</a><a href="#">Contact</a><a href="#">Devenir poseur</a></div>
+  <div>© 2026 Mister Poseur · Écosystème MisterPortail</div>
+</div></footer>
+
+<div class="feed" id="feed"></div>
+
+<script>
+(function(){
+/* ---------- SCREENS ---------- */
+var ST='<div class="status"><span>9:41</span><span>●●● 5G ▮</span></div>';
+var TAB=function(i){var n=['Accueil','Devis','Chantier','Profil'];return '<div class="tabbar">'+n.map(function(x,k){return '<div class="'+(k===i?'on':'')+'"><i></i>'+x+'</div>'}).join('')+'</div><div class="homebar"></div>'};
+var pin=function(l,t,c,s){return '<div style="position:absolute;left:'+l+'%;top:'+t+'%;width:'+s+'px;height:'+s+'px;border-radius:50% 50% 50% 0;background:'+c+';transform:rotate(-45deg)"></div>'};
+var S={
+login:ST+'<div class="sc" style="padding-top:14px"><div class="row" style="justify-content:space-between"><span style="width:26px;height:26px;border-radius:50%;background:#fff;border:1px solid #e3ded3;display:grid;place-items:center;font-weight:800">‹</span><span class="pill grey">Connexion</span></div><div style="text-align:center;margin-top:34px"><div style="width:72px;height:72px;border-radius:20px;margin:0 auto;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.12)"><img src="../logo.png" style="width:100%;height:100%;display:block" alt=""></div><div style="font-size:21px;font-weight:900;letter-spacing:-.02em;margin-top:14px">MISTER POSEUR</div><div class="s" style="font-size:10.5px;color:#4b5062;margin-top:4px">Un poseur vérifié, près de chez vous.</div><div style="display:inline-flex;gap:8px;border:1px solid #e3ded3;border-radius:999px;padding:6px 12px;margin-top:12px;font-size:8px;font-weight:800;letter-spacing:.1em;color:#6b6760">PORTAILS <span style="color:#f26b3a">•</span> FENÊTRES <span style="color:#f26b3a">•</span> VOLETS</div></div><div style="display:grid;gap:9px;margin-top:30px"><div class="abtn navy"> Continuer avec Apple</div><div class="abtn line">G&nbsp; Continuer avec Google</div><div class="row" style="gap:8px;margin:2px 0"><span style="flex:1;height:1px;background:#e3ded3"></span><span class="s" style="font-size:8px;font-weight:800">OU</span><span style="flex:1;height:1px;background:#e3ded3"></span></div><div class="abtn line">✉&nbsp; Continuer avec un e-mail</div><div class="s" style="text-align:center;font-size:8px;font-weight:800;letter-spacing:.08em">CODE À 6 CHIFFRES · SANS MOT DE PASSE</div></div><div class="s" style="text-align:center;font-size:7.5px;font-weight:700;letter-spacing:.06em;margin-top:22px;line-height:1.6">EN CONTINUANT, VOUS ACCEPTEZ NOS CGU.<br>AUCUN DÉMARCHAGE, NI REVENTE DE DONNÉES.</div></div><div class="homebar"></div>',
+form:ST+'<div class="sc"><div class="s" style="margin-top:6px">Étape 2 sur 4</div><div style="height:4px;border-radius:4px;background:#e9e5dc;margin:6px 0 16px"><div style="width:50%;height:100%;background:linear-gradient(90deg,#f26b3a,#f9a03f);border-radius:4px"></div></div><div class="h" style="font-size:17px;margin-bottom:14px">Quel type de portail ?</div><div class="card row" style="border:1.5px solid #f26b3a;margin-bottom:8px"><span style="width:32px;height:32px;border-radius:8px;background:#fdebe2"></span><div><div class="h" style="font-size:11.5px">Coulissant</div><div class="s">Idéal si peu de recul</div></div></div><div class="card row" style="margin-bottom:8px"><span style="width:32px;height:32px;border-radius:8px;background:#efe9df"></span><div><div class="h" style="font-size:11.5px">Battant</div><div class="s">2 vantaux</div></div></div><div class="card row" style="margin-bottom:16px"><span style="width:32px;height:32px;border-radius:8px;background:#efe9df"></span><div><div class="h" style="font-size:11.5px">Je ne sais pas encore</div><div class="s">Le poseur vous conseille</div></div></div><div class="h" style="font-size:12px;margin-bottom:8px">Photos du projet</div><div style="display:flex;gap:8px;margin-bottom:16px"><div style="width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,#cfc9bd,#a8a295)"></div><div style="width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,#b9b3a6,#8e887c)"></div><div style="width:64px;height:64px;border-radius:12px;border:1.5px dashed #cfc9bd;display:grid;place-items:center;color:#9a958b;font-size:18px">+</div></div><div class="abtn navy">Continuer</div></div><div class="homebar"></div>',
+search:ST+'<div class="sc"><div class="s" style="margin-top:6px">Bonjour Mathieu 👋</div><div class="h" style="font-size:17px;margin:2px 0 12px">12 poseurs près de vous</div><div style="height:124px;border-radius:14px;margin-bottom:12px;position:relative;overflow:hidden"><svg viewBox="0 0 240 124" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect width="240" height="124" fill="#ece7dc"/><rect x="83" y="56" width="36" height="27" rx="4" fill="#cfe5c6"/><rect x="50" y="66" width="25" height="24" rx="4" fill="#cfe5c6"/><rect x="75" y="63" width="18" height="24" rx="4" fill="#cfe5c6"/><rect x="21" y="58" width="38" height="18" rx="4" fill="#cfe5c6"/><path d="M-5 20 C 50 10, 80 60, 130 50 S 200 20, 250 45" fill="none" stroke="#bcd6ea" stroke-width="9" stroke-linecap="round"/><line x1="0" y1="70" x2="240" y2="40" stroke="#fff" stroke-width="5" stroke-linecap="round"/><line x1="60" y1="0" x2="110" y2="124" stroke="#fff" stroke-width="5" stroke-linecap="round"/><line x1="0" y1="25" x2="240" y2="95" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/><line x1="150" y1="0" x2="200" y2="124" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/><line x1="0" y1="105" x2="240" y2="120" stroke="#fff" stroke-width="3" stroke-linecap="round"/><line x1="115" y1="0" x2="125" y2="124" stroke="#fff" stroke-width="1.4"/><line x1="219" y1="0" x2="243" y2="124" stroke="#fff" stroke-width="1.4"/><line x1="119" y1="0" x2="122" y2="124" stroke="#fff" stroke-width="1.4"/><line x1="130" y1="0" x2="142" y2="124" stroke="#fff" stroke-width="1.4"/><line x1="48" y1="0" x2="34" y2="124" stroke="#fff" stroke-width="1.4"/><line x1="205" y1="0" x2="212" y2="124" stroke="#fff" stroke-width="1.4"/><line x1="121" y1="0" x2="136" y2="124" stroke="#fff" stroke-width="1.4"/><line x1="157" y1="0" x2="182" y2="124" stroke="#fff" stroke-width="1.4"/><line x1="47" y1="0" x2="28" y2="124" stroke="#fff" stroke-width="1.4"/><line x1="114" y1="0" x2="108" y2="124" stroke="#fff" stroke-width="1.4"/><line x1="36" y1="0" x2="16" y2="124" stroke="#fff" stroke-width="1.4"/><line x1="137" y1="0" x2="156" y2="124" stroke="#fff" stroke-width="1.4"/><line x1="162" y1="0" x2="139" y2="124" stroke="#fff" stroke-width="1.4"/><line x1="152" y1="0" x2="152" y2="124" stroke="#fff" stroke-width="1.4"/><line x1="0" y1="123" x2="240" y2="131" stroke="#fff" stroke-width="1.4"/><line x1="0" y1="83" x2="240" y2="102" stroke="#fff" stroke-width="1.4"/><line x1="0" y1="83" x2="240" y2="73" stroke="#fff" stroke-width="1.4"/><line x1="0" y1="79" x2="240" y2="59" stroke="#fff" stroke-width="1.4"/><line x1="0" y1="106" x2="240" y2="119" stroke="#fff" stroke-width="1.4"/><line x1="0" y1="8" x2="240" y2="-9" stroke="#fff" stroke-width="1.4"/><line x1="0" y1="4" x2="240" y2="-4" stroke="#fff" stroke-width="1.4"/><line x1="0" y1="112" x2="240" y2="107" stroke="#fff" stroke-width="1.4"/><line x1="0" y1="76" x2="240" y2="57" stroke="#fff" stroke-width="1.4"/><line x1="0" y1="99" x2="240" y2="108" stroke="#fff" stroke-width="1.4"/><circle cx="120" cy="66" r="22" fill="#f26b3a" fill-opacity=".12"/><circle cx="120" cy="66" r="5" fill="#1b2a4a" stroke="#fff" stroke-width="2"/><path transform="translate(72 50) scale(1.1)" d="M0-14a6 6 0 0 0-6 6c0 4 6 10 6 10s6-6 6-10a6 6 0 0 0-6-6z" fill="#f26b3a" stroke="#fff" stroke-width="1.2"/><path transform="translate(150 36) scale(0.9)" d="M0-14a6 6 0 0 0-6 6c0 4 6 10 6 10s6-6 6-10a6 6 0 0 0-6-6z" fill="#1b2a4a" stroke="#fff" stroke-width="1.2"/><path transform="translate(132 96) scale(0.9)" d="M0-14a6 6 0 0 0-6 6c0 4 6 10 6 10s6-6 6-10a6 6 0 0 0-6-6z" fill="#1b2a4a" stroke="#fff" stroke-width="1.2"/></svg><span class="pill or" style="position:absolute;left:10px;bottom:10px">Lyon · 25 km</span></div><div class="card row" style="margin-bottom:8px"><span class="av" style="background:#1b2a4a">ML</span><div style="flex:1"><div class="h" style="font-size:11.5px">Menuiserie Lefèvre <span class="badge">✓ vérifié</span></div><div class="s">★ 4.9 · 128 avis · 6 km</div></div><span style="color:#c3beb2">›</span></div><div class="card row" style="margin-bottom:8px"><span class="av" style="background:#f26b3a">SB</span><div style="flex:1"><div class="h" style="font-size:11.5px">S. Bernard Fermetures <span class="badge">✓ vérifié</span></div><div class="s">★ 4.8 · 74 avis · 11 km</div></div><span style="color:#c3beb2">›</span></div><div class="card row"><span class="av" style="background:#f9a03f">AP</span><div style="flex:1"><div class="h" style="font-size:11.5px">Alu Pose 69 <span class="badge">✓ vérifié</span></div><div class="s">★ 4.7 · 52 avis · 18 km</div></div><span style="color:#c3beb2">›</span></div></div>'+TAB(0),
+devis:ST+'<div class="sc"><div class="s" style="margin-top:6px">Portail coulissant alu · 4 m</div><div class="h" style="font-size:17px;margin:2px 0 12px">3 devis reçus</div><div class="card" style="border:1.5px solid #f26b3a;margin-bottom:8px;position:relative"><span class="pill or" style="position:absolute;right:10px;top:10px">Meilleur rapport</span><div class="h" style="font-size:11.5px">Menuiserie Lefèvre</div><div class="s">★ 4.9 · Pose sous 3 semaines</div><div style="font-size:20px;font-weight:900;letter-spacing:-.02em;margin-top:8px">1 290 € <span class="s" style="font-weight:600">TTC pose</span></div></div><div class="card" style="margin-bottom:8px"><div class="h" style="font-size:11.5px">S. Bernard Fermetures</div><div class="s">★ 4.8 · Pose sous 5 semaines</div><div style="font-size:20px;font-weight:900;letter-spacing:-.02em;margin-top:8px">1 450 € <span class="s" style="font-weight:600">TTC pose</span></div></div><div class="card" style="margin-bottom:12px"><div class="h" style="font-size:11.5px">Alu Pose 69</div><div class="s">★ 4.7 · Pose sous 2 semaines</div><div style="font-size:20px;font-weight:900;letter-spacing:-.02em;margin-top:8px">1 520 € <span class="s" style="font-weight:600">TTC pose</span></div></div><div class="abtn or">Comparer les 3 devis</div><div class="s" style="text-align:center;margin-top:8px;font-size:8.5px">Devis détaillés · Poseurs vérifiés</div></div>'+TAB(1),
+suivi:ST+'<div class="sc"><div class="s" style="margin-top:6px">Chantier #2481</div><div class="h" style="font-size:17px;margin:2px 0 16px">Pose prévue le 14 nov.</div>'+[['✓','#1f8a4c','Demande envoyée','2 nov.'],['✓','#1f8a4c','Poseur choisi','Menuiserie Lefèvre'],['●','#f26b3a','Pose planifiée','14 nov. · 8h30'],['','','Chantier terminé','Laissez votre avis']].map(function(x,i){return (i?'<div style="width:2px;height:14px;background:'+(i<3?'#1f8a4c':'#e3ded3')+';margin-left:10px"></div>':'')+'<div class="row" style="gap:10px;padding:4px 0;'+(i===3?'opacity:.5':'')+'"><span style="width:22px;height:22px;border-radius:50%;'+(x[1]?'background:'+x[1]+';color:#fff':'border:2px solid #cfc9bd')+';display:grid;place-items:center;font-size:10px;font-weight:900">'+x[0]+'</span><div><div class="h" style="font-size:11.5px">'+x[2]+'</div><div class="s">'+x[3]+'</div></div></div>'}).join('')+'<div class="card" style="margin-top:16px;background:#fdebe2;border-color:#f9c9b3"><div class="s" style="color:#f26b3a;font-weight:800;font-size:8.5px;letter-spacing:.1em">VOTRE POSEUR</div><div class="h" style="font-size:12px;margin-top:4px">Menuiserie Lefèvre</div><div class="s">★ 4.9 · 128 avis · joignable dans l\'app</div></div><div class="abtn line" style="margin-top:10px">💬 Écrire au poseur</div></div>'+TAB(2),
+pro:ST+'<div class="sc"><div class="s" style="margin-top:6px">Menuiserie Lefèvre · Lyon</div><div class="h" style="font-size:17px;margin:2px 0 12px">Vos demandes</div><div style="display:flex;gap:6px;margin-bottom:12px"><span class="pill or">Nouvelles · 4</span><span class="pill grey">Envoyés · 7</span><span class="pill grey">Terminées</span></div><div class="card" style="margin-bottom:8px"><div class="row" style="justify-content:space-between"><div class="h" style="font-size:11.5px">Portail coulissant alu 4 m</div><span class="pill or" style="padding:3px 7px">Nouveau</span></div><div class="s">Villeurbanne · 6 km · motorisation</div><div class="s" style="margin-top:6px;color:#1b2a4a;font-weight:700">📷 2 photos · dès que possible</div></div><div class="card" style="margin-bottom:8px"><div class="row" style="justify-content:space-between"><div class="h" style="font-size:11.5px">Clôture alu 18 ml</div><span class="pill or" style="padding:3px 7px">Nouveau</span></div><div class="s">Bron · 9 km · sur muret</div></div><div class="card" style="margin-bottom:8px"><div class="row" style="justify-content:space-between"><div class="h" style="font-size:11.5px">6 fenêtres</div><span class="pill green" style="padding:3px 7px">Devis envoyé</span></div><div class="s">Caluire · 12 km · 1 780 €</div></div><div class="card"><div class="row" style="justify-content:space-between"><div class="h" style="font-size:11.5px">Volets roulants x4</div><span class="pill green" style="padding:3px 7px">Acceptée</span></div><div class="s">Lyon 3e · pose le 18 nov.</div></div></div><div class="tabbar"><div class="on"><i></i>Demandes</div><div><i></i>Devis</div><div><i></i>Planning</div><div><i></i>Profil</div></div><div class="homebar"></div>',
+profil:ST+'<div class="sc"><div style="height:70px;border-radius:16px;background:linear-gradient(135deg,#1b2a4a,#2d4270);margin-top:6px"></div><div style="text-align:center;margin-top:-26px"><span class="av" style="width:52px;height:52px;background:#f26b3a;font-size:16px;margin:0 auto;border:3px solid #faf8f3">ML</span><div class="h" style="font-size:15px;margin-top:6px">Menuiserie Lefèvre</div><div class="s">Lyon · 14 ans d\'expérience</div><div style="display:flex;gap:6px;justify-content:center;margin:10px 0"><span class="badge">✓ Identité</span><span class="badge">✓ SIRET</span><span class="badge">✓ Décennale</span></div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:8px 0 12px">'+[['4.9','Note'],['128','Avis'],['96%','Dans les délais']].map(function(x){return '<div class="card" style="text-align:center;padding:10px 6px"><div class="h" style="font-size:15px">'+x[0]+'</div><div class="s" style="font-size:8px">'+x[1]+'</div></div>'}).join('')+'</div><div class="card" style="margin-bottom:8px"><div class="s" style="color:#f9a03f">★★★★★</div><div style="font-size:9.5px;margin-top:4px">« Portail posé en une journée, propre, réglé. On recommande. »</div><div class="s" style="margin-top:4px">Sophie D. · Villeurbanne · chantier vérifié</div></div><div class="abtn or">Demander un devis</div></div>'+TAB(3)
+};
+
+
+/* écrans officiels de l'app */
+S.login='<img class="shot" src="../screens/auth.jpg" alt="">';S.form='<img class="shot" src="../screens/brief.jpg" alt="">';S.search='<img class="shot" src="../screens/liste.jpg" alt="">';S.devis='<img class="shot" src="../screens/profil.jpg" alt="">';S.suivi='<img class="shot" src="../screens/messages.jpg" alt="">';S.pro='<img class="shot" src="../screens/welcome.jpg" alt="">';S.profil='<img class="shot" src="../screens/home.jpg" alt="">';
+/* ---------- 3D RING ---------- */
+var order=['login','search','devis','suivi','pro','profil'];
+var ring=document.getElementById('ring'),wrapEl=document.getElementById('ringwrap'),N=order.length;
+var EDGES='';for(var q=1;q<=9;q++){EDGES+='<i class="edge" style="transform:translateZ(-'+(q*1.3)+'px)"></i>'}
+var BACK=EDGES+'<div class="back"><div class="cam"><i></i><i></i><i></i></div><div class="lg"><img src="../logo.png" alt=""></div></div>';
+function ringR(){return window.innerWidth<=980?Math.max(150,Math.min(230,window.innerWidth*.55)):380}
+function buildRing(){var R=ringR();[].forEach.call(ring.children,function(slot,i){slot.style.transform='rotateY('+(i*360/N)+'deg) translateZ('+R+'px)'})}
+order.forEach(function(k,i){
+  var slot=document.createElement('div');slot.className='slot';
+  slot.innerHTML='<div class="phone"><div class="screen"><div class="island"></div><div class="reflect"></div>'+S[k]+'</div>'+BACK+'</div>';
+  ring.appendChild(slot);
+});
+buildRing();window.addEventListener('resize',buildRing);
+var ang=0,target=0,drag=false,lx=0,ly=0,lockX=null,STEP=360/N,idle=0;
+(function loop(){
+  if(!drag){idle++;if(idle>300){target-=STEP;idle=0}ang+=(target-ang)*.12}
+  ring.style.transform='rotateY('+ang+'deg)';requestAnimationFrame(loop)})();
+function snap(){target=Math.round(ang/STEP)*STEP;idle=0}
+wrapEl.addEventListener('mousedown',function(e){drag=true;lx=e.clientX;e.preventDefault()});
+window.addEventListener('mousemove',function(e){if(!drag)return;var dx=e.clientX-lx;lx=e.clientX;ang+=dx*.35});
+window.addEventListener('mouseup',function(){if(drag){drag=false;snap()}});
+wrapEl.addEventListener('touchstart',function(e){var t=e.touches[0];lx=t.clientX;ly=t.clientY;lockX=null},{passive:true});
+wrapEl.addEventListener('touchmove',function(e){var t=e.touches[0];var dx=t.clientX-lx,dy=t.clientY-ly;
+  if(lockX===null){if(Math.abs(dx)<4&&Math.abs(dy)<4)return;lockX=Math.abs(dx)>Math.abs(dy)}
+  if(!lockX)return;e.preventDefault();drag=true;ang+=dx*.4;lx=t.clientX;ly=t.clientY},{passive:false});
+wrapEl.addEventListener('touchend',function(){if(drag){drag=false;snap()}lockX=null});
+/* ---------- MAP STORY ---------- */
+var ms=document.querySelector('.mapstory'),mf=document.getElementById('mapfixed'),pinsLayer=document.getElementById('pins'),dim=document.getElementById('mapdim'),appsec=document.getElementById('app'),cam=document.getElementById('cam'),pinsEl=[].slice.call(document.querySelectorAll('#pins .pin')),stcs=document.querySelectorAll('.stc'),ht=document.getElementById('herotext'),cnt=document.getElementById('cnt'),regn=document.getElementById('regname');
+// camera path: map fractions (x,y) + region label
+var PATH=[[0.50,0.30,'Bretagne · Normandie · Île-de-France'],[0.52,0.40,'Pays de la Loire · Centre'],[0.52,0.54,'Bourgogne · Auvergne · Rhône-Alpes'],[0.52,0.68,'Nouvelle-Aquitaine · Occitanie'],[0.52,0.78,'Provence · Côte d\'Azur · Corse']];
+var NP=pinsEl.length,shown=0,cx=0,cy=0,tx=0,ty=0,queue=[],camW=cam.offsetWidth,camH=cam.offsetHeight;
+function camLoop(){cx+=(tx-cx)*.16;cy+=(ty-cy)*.16;cam.style.transform='translate3d('+cx.toFixed(2)+'px,'+cy.toFixed(2)+'px,0)';requestAnimationFrame(camLoop)}
+setInterval(function(){var k=queue.length>5?2:1;while(k--){var e=queue.shift();if(e){e._on=true;e.classList.add('on')}}var n=0;pinsEl.forEach(function(x){if(x._on)n++});if(cnt.textContent!=n)cnt.textContent=n},220);
+pinsEl.forEach(function(e){e._x=parseFloat(e.style.left)/100;e._y=parseFloat(e.style.top)/100;e._on=false});
+function lerpPath(p){var s=p*(PATH.length-1),i=Math.min(PATH.length-2,Math.floor(s)),t=s-i;var e=t*t*(3-2*t);return [PATH[i][0]+(PATH[i+1][0]-PATH[i][0])*e,PATH[i][1]+(PATH[i+1][1]-PATH[i][1])*e,PATH[Math.round(s)][2]]}
+function mapTick(){
+  var r=ms.getBoundingClientRect();var p=Math.max(0,Math.min(1,-r.top/(r.height-window.innerHeight)));
+  var ar=appsec.getBoundingClientRect();var total=r.height+ar.height+ (ar.top-r.bottom);var pc=Math.max(0,Math.min(1,-r.top/(total-window.innerHeight)));
+  var fade=Math.max(0,Math.min(1,1-( -(ar.bottom-window.innerHeight) )/260));mf.style.opacity=ar.bottom<window.innerHeight?fade:1;
+  var past=Math.max(0,Math.min(1,(-(r.bottom-window.innerHeight))/320));pinsLayer.style.opacity=1-past;dim.style.opacity=past*.55;
+  ht.style.opacity=Math.max(0,1-p*9);ht.style.pointerEvents=p>.1?'none':'auto';
+  var f=lerpPath(p);var fl=f;var W=camW,H=camH,vw=window.innerWidth,vh=window.innerHeight;
+  var fx=vw>980?vw*.72:vw*.5,fy=vw>980?vh*.46:vh*.34;
+  tx=fx-f[0]*W;ty=fy-f[1]*H;
+  if(regn.textContent!==fl[2])regn.textContent=fl[2];
+  stcs.forEach(function(s){s.classList.toggle('on',p>=+s.dataset.from&&p<+s.dataset.to)});
+  // pins: queue reveals when they enter the view band; dim those behind the text column
+  pinsEl.forEach(function(e){var sy=ty+e._y*H,sx=tx+e._x*W;
+    if(!e._on&&!e._q&&sy>vh*.08&&sy<vh*.62&&sx>-20&&sx<vw+20){e._q=true;queue.push(e)}
+    e.style.opacity=(vw>980?(sx<vw*.46):(sy>vh*.40))?.15:1;
+  });
+  var n=0;pinsEl.forEach(function(e){if(e._on)n++});
+  if(n!==shown){cnt.textContent=n;shown=n}
+}
+
+window.addEventListener('scroll',function(){requestAnimationFrame(mapTick)},{passive:true});
+window.addEventListener('resize',mapTick);window.addEventListener('resize',function(){camW=cam.offsetWidth;camH=cam.offsetHeight});mapTick();cx=tx;cy=ty;camLoop();
+
+/* ---------- FLIP WORDS ---------- */
+var fl=document.getElementById('flip').children,fi=0;
+setInterval(function(){
+  var cur=fl[fi];cur.classList.remove('on');cur.classList.add('out');
+  fi=(fi+1)%fl.length;var nx=fl[fi];nx.classList.remove('out');void nx.offsetWidth;nx.classList.add('on');
+  setTimeout(function(){cur.classList.remove('out')},600);
+},2400);
+
+/* ---------- NAV / MARQUEE / REVEAL ---------- */
+var nav=document.getElementById('nav');
+window.addEventListener('scroll',function(){nav.classList.toggle('scrolled',window.scrollY>20)},{passive:true});
+var t=document.getElementById('track');t.innerHTML+=t.innerHTML;
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);var c=e.target.querySelector('[data-count]');if(c)count(c)}})},{threshold:.15});
+document.querySelectorAll('.rv').forEach(function(el){io.observe(el)});
+function count(el){var to=+el.dataset.count,s=performance.now();(function f(n){var p=Math.min(1,(n-s)/1400);el.textContent=Math.round(to*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(f)})(s)}
+
+/* ---------- STORY ---------- */
+var ss=document.getElementById('storyscreen'),sp=document.getElementById('storyphone'),prog=document.getElementById('prog').children;
+['form','search','devis','suivi'].forEach(function(k,i){var d=document.createElement('div');d.className='scr'+(i?'':' on');d.innerHTML=S[k];ss.appendChild(d)});
+var steps=document.querySelectorAll('.stp'),scrs=ss.querySelectorAll('.scr');
+var so=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var i=[].indexOf.call(steps,e.target);steps.forEach(function(s,k){s.classList.toggle('on',k===i)});scrs.forEach(function(s,k){s.classList.toggle('on',k===i)});[].forEach.call(prog,function(p,k){p.classList.toggle('on',k===i)});sp.style.transform=e.target.dataset.rot}})},{rootMargin:'-45% 0px -45% 0px'});
+steps.forEach(function(s){so.observe(s)});
+
+/* ---------- PRO PHONE ---------- */
+document.getElementById('proscreen').insertAdjacentHTML('beforeend',S.pro);
+var pst=document.getElementById('prostage'),pph=document.getElementById('prophone');
+if(window.matchMedia('(pointer:fine)').matches){
+pst.addEventListener('mousemove',function(e){var r=pst.getBoundingClientRect();var x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;pph.style.transform='rotateY('+(-18+x*30)+'deg) rotateX('+(6-y*20)+'deg) rotateZ(4deg)'});
+pst.addEventListener('mouseleave',function(){pph.style.transform='rotateY(-18deg) rotateX(6deg) rotateZ(4deg)'});
+}
+/* ---------- DEMO ---------- */
+var chips=document.querySelectorAll('.chip'),proj='Portail coulissant';
+chips.forEach(function(c){c.addEventListener('click',function(){chips.forEach(function(x){x.classList.remove('on')});c.classList.add('on');proj=c.dataset.p})});
+var base={'Portail coulissant':1290,'Clôture alu':1850,'Fenêtres':2140,'Volets roulants':980,'Pergola':2460};
+var names=[['ML','#1b2a4a','Menuiserie Lefèvre','4.9','128'],['SB','#f26b3a','S. Bernard Fermetures','4.8','74'],['AP','#f9a03f','Alu Pose','4.7','52']];
+var DEP={"01":["Bourg-en-Bresse",69.85,51.39],"02":["Laon",59.27,18.22],"03":["Moulins",57.37,47.92],"04":["Digne-les-Bains",76.49,72.38],"05":["Gap",75.44,67.72],"06":["Nice",83.26,76.24],"07":["Privas",65.71,65.94],"08":["Charleville-Mézières",66.50,16.14],"09":["Foix",46.07,83.56],"10":["Troyes",62.23,30.69],"11":["Carcassonne",50.93,81.09],"12":["Rodez",52.37,69.80],"13":["Marseille",70.77,80.20],"14":["Caen",33.05,21.98],"15":["Aurillac",51.52,64.06],"16":["Angoulême",36.54,56.93],"17":["La Rochelle",27.93,51.88],"18":["Bourges",51.26,42.77],"19":["Tulle",47.12,60.69],"2A":["Ajaccio",92.92,93.76],"2B":["Bastia",97.59,86.14],"21":["Dijon",68.61,40.40],"22":["Saint-Brieuc",17.35,28.61],"23":["Guéret",47.77,51.78],"24":["Périgueux",40.22,61.58],"25":["Besançon",75.05,41.19],"26":["Valence",67.62,64.06],"27":["Évreux",43.04,23.56],"28":["Chartres",45.28,29.21],"29":["Quimper",8.54,33.76],"30":["Nîmes",64.14,74.85],"31":["Toulouse",44.95,77.23],"32":["Auch",39.36,76.73],"33":["Bordeaux",31.67,64.95],"34":["Montpellier",60.98,77.13],"35":["Rennes",24.45,32.57],"36":["Châteauroux",46.59,45.45],"37":["Tours",40.02,39.70],"38":["Grenoble",73.07,61.49],"39":["Lons-le-Saunier",71.96,46.83],"40":["Mont-de-Marsan",32.20,74.36],"41":["Blois",44.23,37.72],"42":["Saint-Étienne",64.33,59.11],"43":["Le Puy-en-Velay",60.98,62.97],"44":["Nantes",25.30,41.39],"45":["Orléans",47.97,34.65],"46":["Cahors",44.95,68.81],"47":["Agen",39.56,71.29],"48":["Mende",58.49,68.12],"49":["Angers",31.87,38.91],"50":["Saint-Lô",28.32,22.57],"51":["Reims",61.97,21.19],"52":["Chaumont",69.26,32.57],"53":["Laval",30.43,32.97],"54":["Nancy",76.10,26.83],"55":["Bar-le-Duc",69.39,26.04],"56":["Vannes",17.35,37.03],"57":["Metz",76.10,22.57],"58":["Nevers",56.25,43.66],"59":["Lille",55.59,7.62],"60":["Beauvais",49.15,19.50],"61":["Alençon",36.08,29.41],"62":["Arras",53.75,10.99],"63":["Clermont-Ferrand",55.79,55.64],"64":["Pau",33.05,80.20],"65":["Tarbes",35.95,80.89],"66":["Perpignan",54.54,86.14],"67":["Strasbourg",86.41,28.02],"68":["Colmar",83.85,32.87],"69":["Lyon",67.29,55.84],"70":["Vesoul",75.90,37.43],"71":["Mâcon",67.23,50.40],"72":["Le Mans",36.80,33.66],"73":["Chambéry",74.39,57.82],"74":["Annecy",75.77,54.46],"75":["Paris",50.93,25.15],"76":["Rouen",42.71,19.41],"77":["Melun",52.97,28.32],"78":["Versailles",49.48,25.74],"79":["Niort",32.46,50.30],"80":["Amiens",50.60,14.85],"81":["Albi",49.61,73.96],"82":["Montauban",44.36,73.07],"83":["Toulon",74.45,81.98],"84":["Avignon",67.09,73.76],"85":["La Roche-sur-Yon",26.09,46.83],"86":["Poitiers",37.72,47.72],"87":["Limoges",43.77,55.15],"88":["Épinal",77.87,31.98],"89":["Auxerre",58.95,35.64],"90":["Belfort",80.57,37.23],"91":["Évry",51.52,27.43],"92":["Nanterre",50.01,24.85],"93":["Bobigny",51.52,24.65],"94":["Créteil",51.65,25.84],"95":["Cergy",49.15,23.37]};
+var rmap=document.getElementById('rmap'),rcity=document.getElementById('rcity');
+var radar=document.getElementById('radar'),res=document.getElementById('res'),empty=document.getElementById('empty'),pc=document.getElementById('pcount'),pt=document.getElementById('ptitle'),busy=false;
+function animNum(el,to){var s=performance.now();(function f(n){var p=Math.min(1,(n-s)/900);el.textContent=Math.round(to*(1-Math.pow(1-p,3))).toLocaleString('fr-FR')+' €';if(p<1)requestAnimationFrame(f)})(s)}
+document.getElementById('go').addEventListener('click',function(){
+  if(busy)return;busy=true;
+  var cp=document.getElementById('cp').value.trim();if(!/^\d{5}$/.test(cp)){cp='69003';document.getElementById('cp').value=cp}
+  var dep=cp.slice(0,2);if(dep==='20'){dep=(+cp.slice(0,3)<=201)?'2A':'2B'}
+  var city=DEP[dep];if(city){var Wb=rmap.clientWidth,Hb=rmap.clientHeight,Wi=Wb*4,Hi=Wi*2020/2100;var px=(city[1]/100*Wi-Wb/2)/(Wi-Wb)*100,py=(city[2]/100*Hi-Hb/2)/(Hi-Hb)*100;rmap.style.backgroundPosition=px+'% '+py+'%';rcity.textContent=city[0]+' · '+dep}else{rcity.textContent=''}
+  empty.classList.add('off');res.innerHTML='';radar.classList.add('on');
+  radar.querySelectorAll('.pin').forEach(function(p){p.classList.remove('on')});
+  pt.textContent=proj+' · '+(city?city[0]+' ('+cp+')':cp);pc.textContent='Recherche…';
+  var pins=radar.querySelectorAll('.pin');
+  pins.forEach(function(p,i){setTimeout(function(){p.classList.add('on')},900+i*600)});
+  setTimeout(function(){
+    pc.textContent='3 poseurs vérifiés';
+    names.forEach(function(n,i){
+      var price=Math.round((base[proj]||1290)*(1+i*.11)/10)*10;
+      var d=document.createElement('div');d.className='rc'+(i===0?' best':'');
+      d.innerHTML='<span class="av" style="background:'+n[1]+'">'+n[0]+'</span><div><div class="nm">'+n[2]+(i===2?' '+dep:'')+' <span class="badge">✓ vérifié</span></div><div class="mt">★ '+n[3]+' · '+n[4]+' avis · '+[6,11,18][i]+' km · pose sous '+[3,5,2][i]+' sem.</div></div><div class="pr"><b>0 €</b><span>TTC pose</span></div>';
+      res.appendChild(d);
+      setTimeout(function(){d.classList.add('on');animNum(d.querySelector('.pr b'),price)},i*350);
+    });
+    setTimeout(function(){radar.classList.remove('on');busy=false},1500);
+  },2600);
+});
+
+/* ---------- LIVE FEED ---------- */
+var feed=document.getElementById('feed'),F=[
+ ['ML','#1b2a4a','Nouveau devis envoyé','Portail coulissant · Lyon 69'],
+ ['SD','#f26b3a','Chantier terminé · avis 5★','Volets roulants · Nantes 44'],
+ ['AP','#f9a03f','Pose planifiée le 14 nov.','Clôture alu · Toulouse 31'],
+ ['JR','#3a3f4b','Nouveau poseur vérifié','Menuiserie · Bordeaux 33'],
+ ['CM','#1b2a4a','3 devis reçus en 2 h','Fenêtres · Lille 59'],
+ ['TB','#f26b3a','Avis 5★ publié','Pergola · Marseille 13']];
+var fiX=0;
+function toast(){if(window.scrollY<ms.offsetHeight-window.innerHeight){setTimeout(toast,3000);return}
+  var x=F[fiX%F.length];fiX++;
+  var d=document.createElement('div');d.className='toast';
+  d.innerHTML='<span class="av" style="background:'+x[1]+'">'+x[0]+'</span><div><b>'+x[2]+'</b><span>'+x[3]+'</span></div><span class="live">DÉMO</span>';
+  feed.appendChild(d);requestAnimationFrame(function(){requestAnimationFrame(function(){d.classList.add('on')})});
+  setTimeout(function(){d.classList.remove('on');setTimeout(function(){d.remove()},700)},4800);
+  setTimeout(toast,6500+Math.random()*4000);
+}
+setTimeout(toast,3500);
+
+})();
+</script>
+</body>
+</html>
