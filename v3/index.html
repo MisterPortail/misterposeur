@@ -112,6 +112,11 @@ h2.split{perspective:800px}
 .tilt-on{transition:transform .12s linear,border-color .3s!important}
 .cta .gb{--s:min(64vw,300px);margin:0 auto 26px}
 .cta .gb.blue .gbf{animation-delay:-3.5s}
+.gbc{position:absolute;left:-12%;top:-14%;width:124%;height:124%;display:none;cursor:grab;touch-action:pan-y}
+.gbc:active{cursor:grabbing}
+.gb.gl .gbc{display:block}.gb.gl .gbi{visibility:hidden}
+.flipc{position:absolute;left:-10%;top:-10%;width:120%;height:120%;display:none}
+.flip3d.gl .flipc{display:block}.flip3d.gl .coin{visibility:hidden}
 @media(prefers-reduced-motion:reduce){.gbf,.ospin,#pro .hero::after{animation:none}h2 .w{transition:none;opacity:1;transform:none;filter:none}}
 
 /* ===================== NAV + SWITCH ===================== */
@@ -623,7 +628,7 @@ function switchTo(m){
   /* pièce 3D : face avant = scène actuelle, face arrière = scène cible ; la pièce bascule à 180° avec son épaisseur */
   var front=cur==='pro'?fPro:fPart,back=m==='pro'?fPro:fPart;
   front.classList.remove('back');back.classList.add('back');
-  coin.style.transform='rotateX(0deg)';
+  coin.style.transform='rotateX(0deg)';if(window.MP3D&&MP3D.ready)MP3D.flipSetup(cur,m);
   var sh=document.querySelector('.lshadow');sh.style.transform='translateX(-50%)';sh.style.opacity='1';
   ltxt.firstChild.nodeValue='Chargement du mode '+NAME[m];ltxt.classList.remove('sw');
   var n=0;clearInterval(dotsT);dotsT=setInterval(function(){n=(n+1)%4;ldots.textContent='...'.slice(0,n)},380);
@@ -633,7 +638,7 @@ function switchTo(m){
     var D=1600,t0=performance.now();
     var ease=function(t){var c=.9;return t<.5?(Math.pow(2*t,2)*((c+1)*2*t-c))/2:(Math.pow(2*t-2,2)*((c+1)*(t*2-2)+c)+2)/2};
     (function fr(now){var t=Math.min(1,(now-t0)/D),e=ease(t),a=-180*e;
-      coin.style.transform='rotateX('+a.toFixed(2)+'deg)';
+      coin.style.transform='rotateX('+a.toFixed(2)+'deg)';if(window.MP3D&&MP3D.ready)MP3D.flipAngle(-a);
       var s=Math.abs(Math.cos(a*Math.PI/180));sh.style.transform='translateX(-50%) scaleX('+(.55+.45*s).toFixed(3)+')';sh.style.opacity=(.5+.5*s).toFixed(2);
       if(t<1)requestAnimationFrame(fr)})(t0);
   },450);
@@ -794,5 +799,6 @@ if(window.matchMedia('(pointer:fine)').matches){
 }
 })();
 </script>
+<script src="../mp3d.js" defer data-models="../models/"></script>
 </body>
 </html>
