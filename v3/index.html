@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mister Poseur — Particuliers & Poseurs</title>
+<meta name="description" content="Mister Poseur : d'un côté les particuliers qui font faire des travaux, de l'autre les poseurs vérifiés qui les réalisent. Une app, deux univers.">
+<link rel="preload" as="image" href="../scenes/particulier.webp">
+<link rel="preload" as="image" href="../scenes/poseur.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* ===================== THEMES ===================== */
+:root{
+  --ease:cubic-bezier(.2,.8,.2,1);
+  --cream:#faf8f3;--navy:#1b2a4a;
+  /* particulier (default) */
+  --bg:#050506;--bg2:#0b0c0f;--ink:#f6f3ee;--muted:#9a9790;--line:rgba(255,255,255,.08);
+  --a:#f26b3a;--b:#f9a03f;--a-rgb:242,107,58;
+  --grad:linear-gradient(135deg,var(--a),var(--b));
+  --pro-a:#2f80ff;--pro-b:#5ee1c8;--part-a:#f26b3a;--part-b:#f9a03f;
+}
+body[data-mode="pro"]{
+  --bg:#060a12;--bg2:#0a1020;--ink:#eef3ff;--muted:#8a95ad;--line:rgba(140,170,255,.12);
+  --a:#2f80ff;--b:#5ee1c8;--a-rgb:47,128,255;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden;line-height:1.5;transition:background .6s,color .6s}
+body.locked{overflow:hidden}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1200px;margin:0 auto;padding:0 28px}
+::selection{background:var(--a);color:#fff}
+.gt{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* grain */
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:999;opacity:.045;mix-blend-mode:screen;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* curseur natif */
+a,button,.chip,.gpanel,.sw,.lab{cursor:pointer}
+.cur,.cur2{display:none}
+
+/* ===================== GATE (scène 3D) ===================== */
+#gate{position:fixed;inset:0;z-index:200;display:flex;background:#050506;transition:transform 1s var(--ease),opacity .7s .25s;overflow:hidden}
+#gate.away{transform:scale(1.25);opacity:0;pointer-events:none}
+#gcanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.gpanel{flex:1;min-width:0;min-height:0;position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8vh 4vw 6vh;transition:flex .8s var(--ease),opacity .6s}
+.gpanel::before{content:"";position:absolute;inset:0;opacity:.35;transition:opacity .6s;pointer-events:none}
+.gpanel.part::before{background:radial-gradient(70% 60% at 50% 55%,rgba(242,107,58,.5),transparent 70%)}
+.gpanel.pro::before{background:radial-gradient(70% 60% at 50% 55%,rgba(47,128,255,.5),transparent 70%)}
+.gpanel:hover{flex:1.5}.gpanel:hover::before{opacity:1}
+#gate.hover-part .gpanel.pro,#gate.hover-pro .gpanel.part{flex:.7}
+#gate.hover-part .gpanel.pro::before,#gate.hover-pro .gpanel.part::before{opacity:.12}
+#gate.hover-part .gpanel.pro .gb,#gate.hover-pro .gpanel.part .gb{opacity:.4;transform:scale(.8)}
+#gate.hover-part .gpanel.pro .gtxt,#gate.hover-pro .gpanel.part .gtxt{opacity:.4}
+#gate.pick-part .gpanel.pro,#gate.pick-pro .gpanel.part{flex:.0001;opacity:0;transition:flex .8s var(--ease),opacity .25s}
+#gate.pick-part .gdiv,#gate.pick-pro .gdiv,#gate.pick-part .gq,#gate.pick-pro .gq{opacity:0}
+#gate.pick-part .gpanel.part .gb,#gate.pick-pro .gpanel.pro .gb{transform:scale(1.25)}
+/* coupole 3D : image + anneau orbital (moitié arrière / moitié avant) */
+.gb{--s:min(34vw,46vh,440px);--rc:242,107,58;position:relative;width:var(--s);height:var(--s);flex:none;transition:transform .8s var(--ease),opacity .6s;will-change:transform}
+.gpanel.pro .gb,.gb.blue{--rc:47,128,255}
+.gbf{position:absolute;inset:0;animation:fl 7s ease-in-out infinite}
+.gpanel.pro .gbf{animation-delay:-3.5s}
+.gbp{position:absolute;inset:0;perspective:900px}
+.gbi{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 40px 46px rgba(0,0,0,.6));will-change:transform;backface-visibility:visible}
+.rw{position:absolute;inset:0;perspective:900px;pointer-events:none}
+.rw.b{clip-path:inset(-30% -30% 34% -30%)}
+.rw.f{clip-path:inset(66% -30% -30% -30%)}
+.orbit{position:absolute;left:-9%;top:7%;width:118%;height:118%;border-radius:50%;border:1.5px solid rgba(var(--rc),.5);box-shadow:0 0 22px rgba(var(--rc),.35),inset 0 0 22px rgba(var(--rc),.2);transform:rotateX(76deg)}
+.ospin{position:absolute;inset:0;animation:spin 9s linear infinite}
+.ospin i{position:absolute;left:50%;top:-7px;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:#fff;box-shadow:0 0 12px 4px rgba(var(--rc),1),0 0 40px 12px rgba(var(--rc),.6)}
+.ospin::after{content:"";position:absolute;left:50%;bottom:-5px;width:9px;height:9px;margin-left:-4px;border-radius:50%;background:rgba(var(--rc),1);box-shadow:0 0 14px 4px rgba(var(--rc),.8)}
+.gpanel:hover .gb{transform:scale(1.08) translateY(-10px)}
+.gtxt{text-align:center;margin-top:3vh;transition:opacity .6s;position:relative}
+.gtxt h2{font-size:clamp(34px,4.6vw,72px);line-height:1;letter-spacing:-.045em;font-weight:900;text-transform:uppercase}
+.gtxt p{color:#c9c4bb;font-size:clamp(15px,1.3vw,19px);margin-top:10px}
+.gtxt .go{margin-top:22px;display:inline-flex;align-items:center;gap:12px;font-weight:800;font-size:14px;letter-spacing:.04em;text-transform:uppercase;padding:14px 22px 14px 26px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.05);transition:background .4s,border-color .4s,transform .4s,box-shadow .4s}
+.gtxt .go i{font-style:normal;transition:transform .4s var(--ease)}
+.gpanel:hover .go{transform:translateY(-2px)}.gpanel:hover .go i{transform:translateX(5px)}
+.gpanel.part:hover .go{background:#f26b3a;border-color:#f26b3a;box-shadow:0 12px 40px rgba(242,107,58,.5)}
+.gpanel.pro:hover .go{background:#2f80ff;border-color:#2f80ff;box-shadow:0 12px 40px rgba(47,128,255,.5)}
+#gate.intro .gtxt,#gate.intro .gq,#gate.intro .gdiv{opacity:0}
+#gate .gtxt,#gate .gq,#gate .gdiv{transition:opacity .9s}
+.gdiv{position:absolute;left:50%;top:0;bottom:0;width:1px;background:linear-gradient(transparent,rgba(255,255,255,.22),transparent);z-index:2}
+.gbrand{position:absolute;top:28px;left:50%;transform:translateX(-50%);z-index:3;display:flex;align-items:center;gap:12px;font-weight:900;letter-spacing:.02em;font-size:15px}
+.gbrand .mark{box-shadow:0 6px 24px rgba(0,0,0,.6)}
+.gq{position:absolute;top:84px;left:0;right:0;text-align:center;z-index:3;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.5)}
+@media(max-width:860px){
+  #gate{flex-direction:column}
+  .gpanel{padding:6vh 24px 4vh;flex-direction:row;gap:16px;justify-content:space-between}
+  .gpanel:hover{flex:1.25}#gate.hover-part .gpanel.pro,#gate.hover-pro .gpanel.part{flex:.85}
+  .gb{--s:min(42vw,30vh)}
+  .gtxt{text-align:left;margin-top:0;flex:1}
+  .gtxt h2{font-size:clamp(22px,6.6vw,36px)}.gtxt p{font-size:13.5px}
+  .gtxt .go{padding:11px 16px 11px 18px;font-size:12px;margin-top:14px}
+  .gdiv{left:0;right:0;top:50%;bottom:auto;height:1px;width:auto;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent)}
+  .gbrand{top:16px}.gq{top:48px;font-size:11px}
+}
+
+/* ===================== MAGIE (intérieur) ===================== */
+.sprog{position:fixed;left:0;top:0;height:3px;width:100%;z-index:60;background:var(--grad);transform-origin:0 50%;transform:scaleX(0);box-shadow:0 0 14px rgba(var(--a-rgb),.8);pointer-events:none}
+.motes{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#pro .hero::after{content:"";position:absolute;left:-20%;top:-30%;width:140%;height:120%;pointer-events:none;background:radial-gradient(40% 40% at 30% 40%,rgba(47,128,255,.22),transparent 70%),radial-gradient(35% 35% at 70% 60%,rgba(94,225,200,.16),transparent 70%);filter:blur(30px);animation:aurora 14s ease-in-out infinite alternate}
+@keyframes aurora{0%{transform:translate(-4%,-2%) rotate(-4deg)}100%{transform:translate(5%,4%) rotate(5deg)}}
+#pro .hero .wrap{z-index:1}
+h2 .w{display:inline-block;opacity:0;transform:translateY(.55em) rotateX(-50deg);transform-origin:50% 100%;filter:blur(8px);transition:opacity .7s var(--ease),transform .9s var(--ease),filter .7s;transition-delay:calc(var(--i)*55ms)}
+h2.in .w,.in h2 .w{opacity:1;transform:none;filter:none}
+h2.split{perspective:800px}
+.cell,.step{transform-style:preserve-3d}
+.tilt-on{transition:transform .12s linear,border-color .3s!important}
+.cta .gb{--s:min(64vw,300px);margin:0 auto 26px}
+.cta .gb.blue .gbf{animation-delay:-3.5s}
+@media(prefers-reduced-motion:reduce){.gbf,.ospin,#pro .hero::after{animation:none}h2 .w{transition:none;opacity:1;transform:none;filter:none}}
+
+/* ===================== NAV + SWITCH ===================== */
+nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:14px 0;transition:.3s;border-bottom:1px solid transparent}
+nav.scrolled{background:rgba(5,5,6,.6);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-color:var(--line)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:900;letter-spacing:.02em;font-size:16px}
+.mark{width:36px;height:36px;border-radius:10px;overflow:hidden;box-shadow:0 6px 18px rgba(var(--a-rgb),.35);display:block;transition:box-shadow .6s}.mark img{width:100%;height:100%;display:block}
+.navlinks{display:flex;gap:28px;font-size:14px;font-weight:500;color:var(--muted)}
+.navlinks a:hover{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:13px 22px;border-radius:999px;font-weight:700;font-size:14px;border:0;transition:transform .2s,box-shadow .2s,background .6s;will-change:transform;font-family:inherit}
+.btn-primary{background:var(--grad);color:#fff;box-shadow:0 10px 30px rgba(var(--a-rgb),.35)}
+.btn-ghost{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--ink)}
+
+/* --- Le switch façon Airbnb --- */
+.sw{position:relative;display:grid;grid-template-columns:1fr 1fr;align-items:center;height:48px;padding:4px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);user-select:none;min-width:270px}
+.sw .lab{position:relative;z-index:2;text-align:center;font-size:13px;font-weight:700;color:var(--muted);transition:color .4s;padding:0 44px 0 14px;white-space:nowrap}
+.sw .lab:last-of-type{padding:0 14px 0 44px}
+.sw .lab.on{color:#fff}
+.sw .thumb{position:absolute;top:4px;left:4px;height:38px;width:calc(50% - 4px);border-radius:999px;background:var(--grad);transition:transform .6s var(--ease),background .6s;box-shadow:0 8px 24px rgba(var(--a-rgb),.4)}
+body[data-mode="pro"] .sw .thumb{transform:translateX(100%)}
+.sw .disc{position:absolute;top:3px;right:3px;width:32px;height:32px;border-radius:50%;background:#0b0b0d;border:2px solid rgba(255,255,255,.95);overflow:hidden;z-index:3;transition:transform .6s var(--ease);transform:translateX(0) rotate(0deg);box-shadow:0 4px 12px rgba(0,0,0,.4)}
+.sw .disc::before{content:"";position:absolute;inset:0;background:conic-gradient(from 180deg,var(--part-a) 0 180deg,var(--pro-a) 180deg 360deg)}
+@media(max-width:980px){.navlinks{display:none}}
+@media(max-width:640px){.brand span.t{display:none}.sw{min-width:200px;height:44px}.sw .lab{font-size:12px;padding:0 34px 0 8px}.sw .lab:last-of-type{padding:0 8px 0 34px}.sw .thumb{height:34px}.sw .disc{width:28px;height:28px}nav .cta-nav{display:none}}
+
+/* ===== LOADER DE BASCULE (façon Airbnb) ===== */
+.loader{position:fixed;inset:0;z-index:160;background:#07080b;display:grid;place-items:center;align-content:center;gap:34px;opacity:0;pointer-events:none;transition:opacity .4s;color:#f3f1ec;cursor:default}
+.loader.on{opacity:1;pointer-events:auto}
+.loader::before{content:"";position:absolute;inset:0;background:radial-gradient(700px 500px at 50% 60%,rgba(var(--a-rgb),.28),transparent 70%);transition:background .6s}
+.flip3d{width:min(82vw,520px);height:min(82vw,520px);perspective:1500px;perspective-origin:50% 40%;position:relative}
+.coin{position:relative;width:100%;height:100%;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;transform:rotateX(0deg);transform-origin:50% 72%}
+.face{position:absolute;inset:0;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:translateZ(1px)}
+.face.back{transform:rotateX(180deg) translateZ(1px);transform-origin:50% 72%}
+.face img{position:absolute;left:4%;top:0;width:92%;height:auto;display:block;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.lshadow{position:absolute;left:50%;top:90%;width:56%;height:8%;transform:translateX(-50%);border-radius:50%;background:radial-gradient(ellipse,rgba(var(--a-rgb),.45),transparent 70%);filter:blur(8px)}
+.ltxt{font-size:clamp(18px,2.4vw,24px);font-weight:600;letter-spacing:-.01em;position:relative;transition:opacity .3s}
+.ltxt.sw{opacity:0}
+.ldots{display:inline-block;width:1.4em;text-align:left}
+.lbrand{position:absolute;top:28px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;font-weight:900;font-size:13px;letter-spacing:.04em}
+.lbrand .mark{width:28px;height:28px;border-radius:8px;box-shadow:none}
+
+/* ===================== LAYOUT COMMUN ===================== */
+.mode{display:none}
+.mode.on{display:block;animation:modeIn .8s var(--ease)}
+@keyframes modeIn{from{opacity:0}to{opacity:1}}
+section{padding:120px 0;position:relative}
+.kicker{color:var(--a);font-weight:800;font-size:12px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:16px;display:block;transition:color .6s}
+h2{font-size:clamp(34px,4.8vw,60px);line-height:1;letter-spacing:-.035em;font-weight:900}
+.sub{color:var(--muted);font-size:18px;margin-top:18px;max-width:600px}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--a);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 4px rgba(var(--a-rgb),.25)}50%{box-shadow:0 0 0 10px rgba(var(--a-rgb),0)}}
+
+/* hero */
+.hero{position:relative;padding:150px 0 60px;min-height:100vh;overflow:hidden;display:grid;align-items:center}
+.hero::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(900px 600px at 70% 30%,rgba(var(--a-rgb),.2),transparent 60%);transition:background .6s}
+.hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:50px;align-items:center;position:relative}
+h1{font-size:clamp(44px,6.4vw,92px);line-height:.95;letter-spacing:-.045em;font-weight:900;margin:26px 0 22px}
+.flip{display:inline-grid;text-align:left;vertical-align:top;height:1em;overflow:hidden;position:relative}
+.flip span{grid-area:1/1;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;opacity:0;transform:translateY(110%);transition:transform .6s var(--ease),opacity .4s}
+.flip span.on{opacity:1;transform:none}.flip span.out{opacity:0;transform:translateY(-110%)}
+.lead{font-size:19px;color:var(--muted);max-width:560px;margin:0 0 34px}
+.lead b{color:var(--ink);font-weight:600}
+.stores{display:flex;gap:14px;flex-wrap:wrap}
+.sb{display:inline-block;transition:transform .2s}.sb:hover{transform:translateY(-3px)}.sb img{height:54px;width:auto;display:block}
+.stats{display:flex;gap:34px;margin-top:38px;flex-wrap:wrap}
+.stats div b{display:block;font-size:30px;font-weight:900;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.stats div span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+
+/* stage téléphone */
+.stage{position:relative;height:640px;perspective:1400px;display:grid;place-items:center}
+.stage .glow{position:absolute;left:50%;top:50%;width:520px;height:520px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(var(--a-rgb),.35),transparent 60%);filter:blur(30px);pointer-events:none;transition:background .6s}
+.stage .phone{transition:transform .2s}
+.orb{position:absolute;border-radius:50%;filter:blur(2px);opacity:.9;animation:orb 9s ease-in-out infinite}
+.orb.o1{width:14px;height:14px;background:var(--a);left:12%;top:18%}
+.orb.o2{width:8px;height:8px;background:var(--b);right:14%;top:28%;animation-delay:-3s}
+.orb.o3{width:20px;height:20px;background:var(--b);left:18%;bottom:14%;animation-delay:-6s;opacity:.5}
+@keyframes orb{0%,100%{transform:translateY(0)}50%{transform:translateY(-26px)}}
+.tag{position:absolute;padding:12px 16px;border-radius:16px;background:rgba(14,15,18,.8);backdrop-filter:blur(14px);border:1px solid var(--line);font-size:13px;box-shadow:0 20px 50px rgba(0,0,0,.5);display:flex;align-items:center;gap:10px;animation:fl 7s ease-in-out infinite}
+.tag b{display:block;font-size:13px}.tag span{color:var(--muted);font-size:11.5px}
+.tag.t1{left:0;top:22%}.tag.t2{right:0;top:52%;animation-delay:-2.5s}.tag.t3{left:4%;bottom:12%;animation-delay:-5s}
+@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+/* phone */
+.phone{width:272px;height:566px;border-radius:44px;background:#0b0b0d;padding:9px;position:relative;transform-style:preserve-3d;box-shadow:0 0 0 1.5px #2a2a2e,0 0 0 3px #0a0a0a,0 30px 80px rgba(0,0,0,.7)}
+.phone .screen{width:100%;height:100%;border-radius:36px;overflow:hidden;background:var(--cream);color:var(--navy);position:relative;font-size:11px}
+.island{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:82px;height:24px;background:#000;border-radius:20px;z-index:5}
+.status{display:flex;justify-content:space-between;padding:14px 22px 0;font-size:11px;font-weight:700}
+.sc{padding:10px 16px 0}
+.reflect{position:absolute;inset:0;border-radius:36px;pointer-events:none;background:linear-gradient(115deg,rgba(255,255,255,.16),rgba(255,255,255,0) 32%);z-index:4}
+.homebar{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:100px;height:4px;border-radius:4px;background:#111;z-index:5}
+.pill{display:inline-block;padding:5px 10px;border-radius:999px;font-size:8.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.pill.grey{background:#e9e5dc;color:#6b6760}.pill.or{background:#fdebe2;color:#f26b3a}.pill.green{background:#e3f4ea;color:#1f8a4c}.pill.blue{background:#e3ecff;color:#2f80ff}
+.abtn{display:flex;align-items:center;justify-content:center;gap:8px;border-radius:14px;padding:13px;font-weight:800;font-size:11.5px;letter-spacing:.02em;text-transform:uppercase}
+.abtn.navy{background:var(--navy);color:#fff}.abtn.line{border:1.5px solid #dcd6ca;color:var(--navy);background:#fff}.abtn.or{background:linear-gradient(135deg,#f26b3a,#f9a03f);color:#fff}.abtn.blue{background:linear-gradient(135deg,#2f80ff,#5ee1c8);color:#fff}
+.card{background:#fff;border:1px solid #ebe6dc;border-radius:16px;padding:12px}
+.row{display:flex;align-items:center;gap:10px}
+.av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:800;color:#fff;font-size:12px;flex:none}
+.h{font-weight:800;font-size:13px;letter-spacing:-.01em}.s{color:#7b776f;font-size:9.5px}
+.badge{display:inline-flex;align-items:center;gap:3px;background:#e3f4ea;color:#1f8a4c;font-size:8px;font-weight:800;padding:2px 6px;border-radius:999px;text-transform:uppercase;letter-spacing:.06em}
+.tabbar{position:absolute;bottom:0;left:0;right:0;height:60px;background:#fff;border-top:1px solid #ebe6dc;display:flex;justify-content:space-around;align-items:center;padding:0 10px 10px;font-size:8px;font-weight:700;color:#9a958b}
+.tabbar div{display:flex;flex-direction:column;align-items:center;gap:3px}.tabbar .on{color:var(--a)}.tabbar i{width:18px;height:18px;border-radius:6px;background:currentColor;display:block}
+
+/* marquee */
+.marquee{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:20px 0;overflow:hidden;background:var(--bg2)}
+.track{display:flex;gap:56px;white-space:nowrap;animation:mq 32s linear infinite;width:max-content}
+.track span{font-weight:800;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:56px}
+.track span::after{content:"•";color:var(--a)}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:56px}
+.step{border:1px solid var(--line);border-radius:28px;padding:34px 30px;background:rgba(255,255,255,.025);position:relative;overflow:hidden;transition:.3s}
+.step:hover{border-color:rgba(var(--a-rgb),.5);transform:translateY(-4px)}
+.step .n{font-family:'Space Grotesk',sans-serif;font-size:64px;font-weight:700;line-height:1;letter-spacing:-.04em}
+.step h3{font-size:22px;font-weight:800;letter-spacing:-.02em;margin:16px 0 8px}.step p{color:var(--muted);font-size:15px}
+.step::after{content:"";position:absolute;right:-40px;bottom:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(var(--a-rgb),.25),transparent 70%);opacity:0;transition:opacity .4s}
+.step:hover::after{opacity:1}
+
+/* bento */
+.bento{display:grid;grid-template-columns:repeat(12,1fr);gap:18px;margin-top:56px}
+.cell{border:1px solid var(--line);border-radius:28px;padding:32px;background:rgba(255,255,255,.025);position:relative;overflow:hidden;transition:.3s}
+.cell:hover{border-color:rgba(var(--a-rgb),.5);transform:translateY(-4px)}
+.cell::before{content:"";position:absolute;inset:0;background:radial-gradient(300px 200px at var(--x,50%) var(--y,50%),rgba(var(--a-rgb),.14),transparent 60%);opacity:0;transition:opacity .3s;pointer-events:none}
+.cell:hover::before{opacity:1}
+.cell h3{font-size:21px;font-weight:800;letter-spacing:-.02em;margin:18px 0 8px}.cell p{color:var(--muted);font-size:15px}
+.cell .ic{width:46px;height:46px;border-radius:14px;background:var(--grad);display:grid;place-items:center;box-shadow:0 8px 24px rgba(var(--a-rgb),.35)}
+.c4{grid-column:span 4}.c6{grid-column:span 6}.c8{grid-column:span 8}
+.cell.big{min-height:320px;display:flex;flex-direction:column;justify-content:flex-end}
+.cell.big .num{font-size:92px;font-weight:900;letter-spacing:-.05em;line-height:1}
+
+/* pro : flux de demandes en direct */
+.feedbox{border-radius:32px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));padding:26px;min-height:520px;position:relative;overflow:hidden}
+.feedbox .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.zone{position:relative;height:240px;border-radius:22px;overflow:hidden;background:#06080f;border:1px solid var(--line)}
+.zone .bgmap{position:absolute;left:0;top:0;width:1600px;height:auto;max-width:none;pointer-events:none;user-select:none;filter:saturate(.55) hue-rotate(190deg) brightness(.9)}
+.zone::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,transparent 35%,rgba(6,8,15,.75) 90%);pointer-events:none}
+.zone .city{position:absolute;left:50%;top:50%;transform:translate(-50%,14px);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#fff;font-weight:800;text-shadow:0 1px 2px #000,0 0 12px rgba(47,128,255,.8);z-index:2}
+.zone .me{position:absolute;left:50%;top:50%;width:14px;height:14px;border-radius:50%;background:#fff;transform:translate(-50%,-50%);box-shadow:0 0 0 5px rgba(255,255,255,.2);z-index:2}
+.zone .rad{position:absolute;left:50%;top:50%;width:var(--r,200px);height:var(--r,200px);border-radius:50%;transform:translate(-50%,-50%);border:1.5px dashed rgba(var(--a-rgb),.7);background:rgba(var(--a-rgb),.12);transition:width .6s var(--ease),height .6s var(--ease);z-index:1}
+.zone .pulse,.zone .me,.zone .req,.zone .lbl{z-index:1}
+.zone .pulse{position:absolute;left:50%;top:50%;width:var(--r,200px);height:var(--r,200px);border-radius:50%;transform:translate(-50%,-50%);border:1px solid rgba(var(--a-rgb),.8);animation:ring 2.4s ease-out infinite}
+@keyframes ring{0%{transform:translate(-50%,-50%) scale(.3);opacity:1}100%{transform:translate(-50%,-50%) scale(1.1);opacity:0}}
+.zone .req{position:absolute;width:12px;height:12px;border-radius:50%;background:var(--b);box-shadow:0 0 0 4px rgba(94,225,200,.25);transform:scale(0);transition:transform .5s cubic-bezier(.3,1.5,.5,1)}
+.zone .req.on{transform:scale(1)}
+.zone .lbl{position:absolute;left:12px;bottom:12px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.rng{display:flex;align-items:center;gap:14px;margin:16px 0 6px;font-size:13px;color:var(--muted)}
+.rng input{flex:1;accent-color:var(--a)}
+.rng b{color:var(--ink);font-variant-numeric:tabular-nums;min-width:52px;text-align:right}
+.reqs{display:grid;gap:10px;margin-top:12px}
+.rq{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:18px;background:rgba(255,255,255,.05);border:1px solid var(--line);opacity:0;transform:translateY(14px);transition:.5s}
+.rq.on{opacity:1;transform:none}
+.rq .nm{font-weight:800;font-size:14px}.rq .mt{color:var(--muted);font-size:12px}
+.rq .pr{margin-left:auto;text-align:right}.rq .pr b{font-size:16px;font-weight:900;letter-spacing:-.02em;display:block}.rq .pr span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.rq .new{font-size:9px;letter-spacing:.12em;color:var(--b);font-weight:800;text-transform:uppercase}
+.grid2{display:grid;grid-template-columns:1fr 1.1fr;gap:60px;align-items:center}
+
+/* avant / après */
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:40px}
+.ba .col{border-radius:28px;padding:34px;border:1px solid var(--line);position:relative;overflow:hidden}
+.ba .col.bad{background:rgba(255,255,255,.02)}
+.ba .col.good{background:linear-gradient(180deg,rgba(var(--a-rgb),.14),rgba(var(--a-rgb),.03));border-color:rgba(var(--a-rgb),.4)}
+.ba h4{font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--muted);margin-bottom:18px}
+.ba .good h4{color:var(--a)}
+.ba ul{list-style:none;display:grid;gap:14px}
+.ba li{display:flex;gap:12px;font-size:16px;color:#d6d2ca;align-items:flex-start}
+.ba li i{width:22px;height:22px;border-radius:50%;flex:none;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:900;margin-top:2px}
+.ba .bad li i{background:rgba(255,255,255,.08);color:#999}.ba .good li i{background:var(--grad);color:#fff}
+.ba .bad li{text-decoration:line-through;text-decoration-color:rgba(255,255,255,.25);color:#8a877f}
+
+/* bascule inline (pont entre les deux mondes) */
+.bridge{text-align:center;padding:100px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg2);overflow:hidden;position:relative}
+.bridge h2{font-size:clamp(30px,4vw,52px)}
+.bridge .btn{margin-top:30px}
+.bridge .halo{position:absolute;left:50%;top:50%;width:900px;height:900px;transform:translate(-50%,-50%);border-radius:50%;background:conic-gradient(from 0deg,rgba(242,107,58,.12),rgba(47,128,255,.12),rgba(242,107,58,.12));filter:blur(60px);animation:spin 18s linear infinite;pointer-events:none}
+
+/* cta */
+.cta{text-align:center;padding:160px 0 120px;overflow:hidden}
+.cta-glow{position:absolute;left:50%;top:45%;width:1000px;height:700px;transform:translate(-50%,-50%);background:radial-gradient(ellipse,rgba(var(--a-rgb),.28),transparent 60%);filter:blur(40px);pointer-events:none;transition:background .6s}
+.cta h2{font-size:clamp(44px,7vw,96px);letter-spacing:-.045em}
+.cta .stores{justify-content:center;margin-top:40px}
+.cta .wrap{position:relative}
+.form{display:flex;gap:10px;margin:36px auto 0;max-width:560px}
+.form input{flex:1;padding:16px 18px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink);font:inherit;font-size:16px;outline:none;transition:.2s}
+.form input:focus{border-color:rgba(var(--a-rgb),.7);box-shadow:0 0 0 4px rgba(var(--a-rgb),.15)}
+.form button{padding:16px 24px;border-radius:16px;border:0;background:var(--grad);color:#fff;font:inherit;font-weight:800;font-size:15px;box-shadow:0 10px 30px rgba(var(--a-rgb),.35)}
+footer{border-top:1px solid var(--line);padding:40px 0;color:var(--muted);font-size:13px}
+footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+footer .links{display:flex;gap:24px}
+
+
+/* ===== CARTE DE FRANCE (reprise V1) — univers particulier ===== */
+.mapfixed{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:#050506}
+.cam{position:absolute;left:0;top:0;height:240vh;aspect-ratio:1050/1010;will-change:transform;backface-visibility:hidden;transform:translate3d(0,0,0)}
+.nightmap{position:absolute;left:0;top:0;width:100%;height:100%;display:block;user-select:none;-webkit-user-select:none;pointer-events:none}
+.vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 64% 50%,transparent 40%,rgba(5,5,6,.7) 85%),linear-gradient(90deg,rgba(5,5,6,.97) 0%,rgba(5,5,6,.82) 36%,transparent 58%),linear-gradient(180deg,rgba(5,5,6,.6),transparent 18%,transparent 85%,rgba(5,5,6,.9))}
+.mapdim{position:absolute;inset:0;background:#050506;opacity:0;pointer-events:none}
+.pins{position:absolute;inset:0;transition:opacity .3s}
+.pin{position:absolute;width:0;height:0;pointer-events:none;transition:opacity .4s}
+.pin img{position:absolute;left:0;bottom:0;width:44px;height:auto;transform:translate(-9%,-120vh);opacity:0;filter:drop-shadow(0 10px 12px rgba(0,0,0,.6)) drop-shadow(0 0 14px rgba(242,107,58,.55))}
+.pin.on img{animation:drop .85s cubic-bezier(.25,.9,.3,1.1) forwards}
+@keyframes drop{0%{transform:translate(-9%,-120vh);opacity:0}30%{opacity:1}85%{transform:translate(-9%,8px)}100%{transform:translate(-9%,0);opacity:1}}
+.pin .lbl{position:absolute;top:-56px;left:46px;white-space:nowrap;font-size:12px;color:rgba(255,230,205,.85);text-shadow:0 1px 2px rgba(0,0,0,.9);opacity:0;transform:translateX(-8px);transition:opacity .5s,transform .5s;letter-spacing:.02em}
+.pin .lbl b{display:block;color:#fff;font-size:15px;font-weight:800;letter-spacing:-.01em;text-shadow:0 1px 2px rgba(0,0,0,.9),0 0 18px rgba(242,107,58,.8)}
+.pin .lbl::before{content:"";position:absolute;left:-12px;top:50%;width:8px;height:1px;background:rgba(249,160,63,.8);box-shadow:0 0 8px rgba(249,160,63,.9)}
+.pin.l .lbl{left:auto;right:16px;text-align:right;transform:translateX(8px)}.pin.l .lbl::before{left:auto;right:-12px}
+.pin.on .lbl{opacity:1;transform:none;transition-delay:.7s}
+.mapstory{height:380vh;position:relative;z-index:1}
+.mapsticky{position:sticky;top:0;height:100vh;overflow:hidden;z-index:2;pointer-events:none}
+.mapsticky>*{pointer-events:auto}
+.herotext{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);box-sizing:content-box;max-width:600px;padding:0 0 0 max(28px,calc((100vw - 1200px)/2 + 28px));transition:opacity .3s;z-index:3}
+.herotext h1{text-align:left;margin:26px 0 20px;font-size:clamp(42px,5.6vw,78px)}
+.herotext .lead{margin:0 0 30px;text-align:left}
+.hint{margin-top:26px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:inline-flex;gap:10px;align-items:center}
+.hint i{width:28px;height:1px;background:var(--muted);display:block}
+.stepcards{position:absolute;left:0;top:50%;transform:translateY(-50%);max-width:520px;z-index:3;pointer-events:none}
+.stc{position:absolute;left:max(28px,calc((100vw - 1200px)/2 + 28px));top:0;transform:translateY(calc(-50% + 30px));width:min(480px,80vw);opacity:0;transition:opacity .5s,transform .6s var(--ease);pointer-events:none}
+.stc.on{opacity:1;transform:translateY(-50%);pointer-events:auto}
+.stc h3{font-size:clamp(28px,3.4vw,44px);letter-spacing:-.03em;font-weight:900;line-height:1.05;margin:4px 0 14px}
+.stc p{color:var(--muted);font-size:17px}
+.counter{position:absolute;left:max(28px,calc((100vw - 1200px)/2 + 28px));bottom:34px;display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:18px;background:rgba(10,11,14,.6);backdrop-filter:blur(12px);border:1px solid var(--line);z-index:3;color:var(--muted);font-size:12px;line-height:1.3}
+.counter b{font-size:34px;font-weight:900;letter-spacing:-.03em;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:tabular-nums}
+.region{position:absolute;right:max(28px,calc((100vw - 1200px)/2 + 28px));top:96px;z-index:3;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,220,180,.6);display:flex;align-items:center;gap:10px}
+.region i{width:6px;height:6px;border-radius:50%;background:var(--a);box-shadow:0 0 10px var(--a);animation:pulse 2s infinite}
+#part>section,#part>.marquee,#part>.bridge{position:relative;z-index:1;background-color:var(--bg)}
+#part>.marquee{background:rgba(8,9,12,.75);backdrop-filter:blur(10px)}
+@media(max-width:980px){
+  .mapstory{height:340vh}.cam{height:185vh}
+  .vignette{background:linear-gradient(180deg,rgba(5,5,6,.6),transparent 25%,transparent 55%,rgba(5,5,6,.97) 78%)}
+  .herotext{top:auto;bottom:0;transform:none;padding:0 22px 40px;max-width:none}
+  .herotext h1{font-size:clamp(36px,10vw,56px)}
+  .stepcards{top:auto;bottom:0;transform:none;padding:0}
+  .stc{left:22px;top:auto;bottom:40px;transform:translateY(20px)}.stc.on{transform:none}
+  .counter{right:16px;left:auto;bottom:auto;top:84px;padding:10px 12px}.counter b{font-size:24px}
+  .region{display:none}
+  .pin img{width:34px}.pin .lbl{top:-46px;left:36px}.pin .lbl b{font-size:13px}.pin .lbl{font-size:11px}
+}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(28px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.rv.in{opacity:1;transform:none}.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
+
+@media(max-width:980px){
+  .hero .wrap,.grid2{grid-template-columns:1fr}
+  .hero{padding-top:120px}
+  .stage{height:560px}.stage .phone{transform:scale(.85)!important}
+  .tag.t1{left:-6px;top:6%}.tag.t2{right:-6px;top:auto;bottom:18%}.tag.t3{display:none}
+  .steps{grid-template-columns:1fr}
+  .c4,.c6,.c8{grid-column:span 12}
+  .ba{grid-template-columns:1fr}
+  section{padding:90px 0}
+  .form{flex-direction:column}
+}
+</style>
+</head>
+<body data-mode="part" class="locked">
+<div class="cur"></div><div class="cur2"></div>
+<div class="loader" id="loader" aria-live="polite">
+  <div class="lbrand"><span class="mark"><img src="../logo.png" alt=""></span>MISTER POSEUR</div>
+  <div class="flip3d"><div class="coin" id="coin">
+    <!-- ===== SCÈNE PARTICULIER : maison + personne perplexe + matériaux ===== -->
+    <div class="face" id="face-part"><img src="../scenes/particulier.webp" alt="" draggable="false"></div>
+    <!-- ===== SCÈNE POSEUR : camionnette de chantier ===== -->
+    <div class="face back" id="face-pro"><img src="../scenes/poseur.webp" alt="" draggable="false"></div>
+  </div><div class="lshadow"></div></div>
+  <div class="ltxt" id="ltxt">Chargement du mode poseur<span class="ldots" id="ldots">.</span></div>
+</div>
+
+<!-- ===================== PORTE D'ENTRÉE ===================== -->
+<div id="gate" class="intro">
+  <canvas id="gcanvas"></canvas>
+  <div class="gbrand"><span class="mark"><img src="../logo.png" alt="Mister Poseur"></span>MISTER POSEUR</div>
+  <div class="gq">Vous êtes…</div>
+  <div class="gdiv"></div>
+  <a class="gpanel part" data-pick="part" href="#part">
+    <div class="gb "><div class="gbf"><div class="rw b"><div class="orbit"><div class="ospin"><i></i></div></div></div><div class="gbp"><img class="gbi" src="../scenes/particulier.webp" alt="" draggable="false"></div><div class="rw f"><div class="orbit"><div class="ospin"><i></i></div></div></div></div></div>
+    <div class="gtxt"><h2>Particulier</h2><p>J'ai des travaux à faire faire</p><span class="go">Entrer <i>→</i></span></div>
+  </a>
+  <a class="gpanel pro" data-pick="pro" href="#pro">
+    <div class="gb "><div class="gbf"><div class="rw b"><div class="orbit"><div class="ospin"><i></i></div></div></div><div class="gbp"><img class="gbi" src="../scenes/poseur.webp" alt="" draggable="false"></div><div class="rw f"><div class="orbit"><div class="ospin"><i></i></div></div></div></div></div>
+    <div class="gtxt"><h2>Poseur</h2><p>Je réalise des travaux</p><span class="go">Entrer <i>→</i></span></div>
+  </a>
+</div>
+<div class="sprog" id="sprog"></div>
+
+<!-- ===================== NAV ===================== -->
+<nav id="nav"><div class="wrap">
+  <a href="#" class="brand" id="brandlink"><span class="mark"><img src="../logo.png" alt="Mister Poseur"></span><span class="t">MISTER POSEUR</span></a>
+  <div class="sw" id="sw" role="tablist" aria-label="Choisir votre univers">
+    <div class="thumb"><div class="disc" id="disc"></div></div>
+    <div class="lab on" data-m="part" role="tab">Particulier</div>
+    <div class="lab" data-m="pro" role="tab">Poseur</div>
+  </div>
+  <a href="#telecharger" class="btn btn-primary mag cta-nav" id="navcta">Télécharger l'app</a>
+</div></nav>
+
+<!-- ===================== UNIVERS PARTICULIER ===================== -->
+<main class="mode on" id="part">
+  <div class="mapfixed" id="mapfixed"><div class="cam" id="cam">
+    <img class="nightmap" src="../nightmap.jpg" alt="" draggable="false">
+    <div class="pins" id="pins"><div class="pin r" style="left:44.95%;top:77.23%"><img src="../pin.png" alt=""><span class="lbl"><b>ARBAT</b>Toulouse</span></div><div class="pin r" style="left:67.29%;top:55.84%"><img src="../pin.png" alt=""><span class="lbl"><b>Art Bâtiment</b>Lyon</span></div><div class="pin r" style="left:25.3%;top:41.39%"><img src="../pin.png" alt=""><span class="lbl"><b>François Bâtiment</b>Nantes</span></div><div class="pin l" style="left:55.59%;top:7.62%"><img src="../pin.png" alt=""><span class="lbl"><b>Menuiserie Lefèvre</b>Lille</span></div><div class="pin r" style="left:31.67%;top:64.95%"><img src="../pin.png" alt=""><span class="lbl"><b>Alu Pose 33</b>Bordeaux</span></div><div class="pin r" style="left:24.45%;top:32.57%"><img src="../pin.png" alt=""><span class="lbl"><b>S. Bernard Fermetures</b>Rennes</span></div><div class="pin l" style="left:70.77%;top:80.2%"><img src="../pin.png" alt=""><span class="lbl"><b>Portails du Sud</b>Marseille</span></div><div class="pin l" style="left:86.41%;top:28.02%"><img src="../pin.png" alt=""><span class="lbl"><b>Fermetures Alsace</b>Strasbourg</span></div><div class="pin r" style="left:50.93%;top:25.15%"><img src="../pin.png" alt=""><span class="lbl"><b>Atelier Morel</b>Paris</span></div><div class="pin l" style="left:83.19%;top:76.24%"><img src="../pin.png" alt=""><span class="lbl"><b>Azur Menuiserie</b>Nice</span></div><div class="pin r" style="left:60.98%;top:77.13%"><img src="../pin.png" alt=""><span class="lbl"><b>Occitane Pose</b>Montpellier</span></div><div class="pin r" style="left:42.71%;top:19.41%"><img src="../pin.png" alt=""><span class="lbl"><b>Normandie Fermetures</b>Rouen</span></div><div class="pin r" style="left:40.02%;top:39.7%"><img src="../pin.png" alt=""><span class="lbl"><b>Loire Menuiserie</b>Tours</span></div><div class="pin r" style="left:55.79%;top:55.64%"><img src="../pin.png" alt=""><span class="lbl"><b>Auvergne Alu</b>Clermont-Ferrand</span></div><div class="pin l" style="left:68.61%;top:40.4%"><img src="../pin.png" alt=""><span class="lbl"><b>Bourgogne Portails</b>Dijon</span></div><div class="pin r" style="left:43.77%;top:55.15%"><img src="../pin.png" alt=""><span class="lbl"><b>Limousin Pose</b>Limoges</span></div><div class="pin l" style="left:73.07%;top:61.49%"><img src="../pin.png" alt=""><span class="lbl"><b>Alpes Menuiserie</b>Grenoble</span></div><div class="pin r" style="left:5.98%;top:29.8%"><img src="../pin.png" alt=""><span class="lbl"><b>Breizh Fermetures</b>Brest</span></div><div class="pin l" style="left:76.1%;top:22.57%"><img src="../pin.png" alt=""><span class="lbl"><b>Lorraine Pose</b>Metz</span></div><div class="pin r" style="left:33.05%;top:21.98%"><img src="../pin.png" alt=""><span class="lbl"><b>Caen Alu</b>Caen</span></div><div class="pin r" style="left:47.97%;top:34.65%"><img src="../pin.png" alt=""><span class="lbl"><b>Val de Loire Portails</b>Orléans</span></div><div class="pin l" style="left:61.97%;top:21.19%"><img src="../pin.png" alt=""><span class="lbl"><b>Champagne Menuiserie</b>Reims</span></div><div class="pin r" style="left:54.54%;top:86.14%"><img src="../pin.png" alt=""><span class="lbl"><b>Catalane Pose</b>Perpignan</span></div><div class="pin r" style="left:25.83%;top:78.32%"><img src="../pin.png" alt=""><span class="lbl"><b>Basque Fermetures</b>Bayonne</span></div><div class="pin l" style="left:92.92%;top:93.76%"><img src="../pin.png" alt=""><span class="lbl"><b>Corsica Pose</b>Ajaccio</span></div><div class="pin r" style="left:37.72%;top:47.72%"><img src="../pin.png" alt=""><span class="lbl"><b>Poitou Menuiserie</b>Poitiers</span></div><div class="pin r" style="left:36.8%;top:33.66%"><img src="../pin.png" alt=""><span class="lbl"><b>Sarthe Alu</b>Le Mans</span></div><div class="pin r" style="left:50.6%;top:14.85%"><img src="../pin.png" alt=""><span class="lbl"><b>Picardie Pose</b>Amiens</span></div><div class="pin l" style="left:75.05%;top:41.19%"><img src="../pin.png" alt=""><span class="lbl"><b>Doubs Fermetures</b>Besançon</span></div><div class="pin r" style="left:33.05%;top:80.2%"><img src="../pin.png" alt=""><span class="lbl"><b>Béarn Pose</b>Pau</span></div><div class="pin r" style="left:31.87%;top:38.91%"><img src="../pin.png" alt=""><span class="lbl"><b>Anjou Portails</b>Angers</span></div><div class="pin r" style="left:64.14%;top:74.85%"><img src="../pin.png" alt=""><span class="lbl"><b>Gard Menuiserie</b>Nîmes</span></div><div class="pin l" style="left:75.77%;top:54.46%"><img src="../pin.png" alt=""><span class="lbl"><b>Savoie Alu</b>Annecy</span></div></div>
+  </div><div class="vignette"></div><div class="mapdim" id="mapdim"></div></div>
+  <header class="mapstory" id="top">
+    <div class="mapsticky">
+      <div class="region"><i></i><span id="regname">Bretagne · Normandie · Île-de-France</span></div>
+      <div class="herotext" id="herotext">
+        <span class="eyebrow"><span class="dot"></span> Bientôt disponible · iOS & Android</span>
+        <h1>Un poseur <span class="flip" data-flip><span class="on">vérifié,</span><span>assuré,</span><span>noté,</span><span>local,</span></span><br>près de chez vous.</h1>
+        <p class="lead">Portails, fenêtres, volets. Décrivez votre projet, recevez des devis de <b>professionnels contrôlés</b>, comparez et suivez votre chantier — depuis votre poche.</p>
+        <div class="stores">
+          <a class="sb" href="#telecharger" aria-label="Télécharger dans l'App Store"><img src="../badges/app-store.png" alt="App Store"></a>
+          <a class="sb" href="#telecharger" aria-label="Disponible sur Google Play"><img src="../badges/google-play.png" alt="Google Play"></a>
+        </div>
+        <div class="hint"><i></i> Faites défiler <i></i></div>
+      </div>
+      <div class="stepcards">
+        <div class="stc" data-from="0.1" data-to="0.4"><span class="kicker">Partout en France</span><h3>Un réseau de poseurs, région par région.</h3><p>Chaque épingle est un professionnel du portail, de la fenêtre ou du volet, recruté dans sa zone.</p></div>
+        <div class="stc" data-from="0.4" data-to="0.68"><span class="kicker">Vérifiés un par un</span><h3>Identité, SIRET, assurance décennale, avis.</h3><p>Aucun poseur n'apparaît sur la carte sans avoir passé le contrôle. C'est la règle.</p></div>
+        <div class="stc" data-from="0.68" data-to="1.01"><span class="kicker">Près de chez vous</span><h3>Le bon poseur est à quelques kilomètres.</h3><p>Vous décrivez votre projet, les poseurs vérifiés de votre zone vous répondent. Zéro démarchage.</p><a href="#comment" class="btn btn-primary mag" style="margin-top:22px">Découvrir l'application</a></div>
+      </div>
+      <div class="counter" id="counter"><b id="cnt">0</b><span>poseurs vérifiés<br>sur la carte</span></div>
+    </div>
+  </header>
+
+  <div class="marquee"><div class="track" data-track><span>Portails</span><span>Clôtures</span><span>Pergolas</span><span>Carports</span><span>Fenêtres</span><span>Volets</span><span>Portes d'entrée</span><span>Portes de garage</span><span>Menuiseries</span></div></div>
+
+  <section id="comment">
+    <div class="wrap">
+      <div class="rv" style="max-width:720px"><span class="kicker">Comment ça marche</span><h2>Trois étapes. Zéro appel.</h2><p class="sub">Vous gardez la main de bout en bout : vous choisissez, vous échangez et vous réglez directement avec le poseur.</p></div>
+      <div class="steps">
+        <div class="step rv"><div class="n gt">01</div><h3>Décrivez votre projet</h3><p>Type, dimensions, deux photos, code postal. Pas de mot de passe : un code à 6 chiffres suffit.</p></div>
+        <div class="step rv d1"><div class="n gt">02</div><h3>Les poseurs vérifiés répondent</h3><p>Seuls les pros contrôlés de votre zone voient votre demande. Devis au même format, comparables en un clic.</p></div>
+        <div class="step rv d2"><div class="n gt">03</div><h3>Suivez votre chantier</h3><p>Date de pose, messages, photos, documents : tout l'historique au même endroit, en direct avec le poseur.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+    <div class="wrap">
+      <div class="rv" style="max-width:720px"><span class="kicker">Pourquoi Mister Poseur</span><h2>Pensé par des poseurs, pour les particuliers.</h2></div>
+      <div class="bento">
+        <div class="cell c4 big rv"><div class="num gt" data-count="100">0</div><h3>% de poseurs vérifiés</h3><p>Identité, SIRET, assurance décennale et avis contrôlés avant la première mise en relation.</p></div>
+        <div class="cell c4 rv d1"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h10M4 17h7"/></svg></div><h3>Devis comparables</h3><p>Même structure pour tous : main-d'œuvre, fournitures, déplacement.</p></div>
+        <div class="cell c4 rv d2"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M4 12h16M14 6l6 6-6 6"/></svg></div><h3>Mise en relation directe</h3><p>Vous traitez et réglez directement avec le poseur que vous avez choisi.</p></div>
+        <div class="cell c6 rv"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M12 7v5l3 3"/></svg></div><h3>Un chantier, un fil</h3><p>Messages, photos, date de pose, documents : tout au même endroit, sans fouiller ses mails.</p></div>
+        <div class="cell c6 rv d1"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div><h3>Zéro démarchage</h3><p>Pas d'appels, pas de revente de contact. Vous contactez les poseurs, pas l'inverse.</p></div>
+      </div>
+      <div class="rv" style="margin-top:110px;max-width:720px"><span class="kicker">Avant / après</span><h2>Trouver un poseur, avant et avec Mister Poseur.</h2></div>
+      <div class="ba rv d1">
+        <div class="col bad"><h4>Avant</h4><ul><li><i>✕</i>5 sites de devis, 12 appels de démarchage dans la semaine</li><li><i>✕</i>Des devis impossibles à comparer</li><li><i>✕</i>Aucune idée si l'artisan est assuré</li><li><i>✕</i>Le suivi du chantier… par SMS perdus</li></ul></div>
+        <div class="col good"><h4>Avec Mister Poseur</h4><ul><li><i>✓</i>Une demande, des poseurs vérifiés qui vous répondent</li><li><i>✓</i>Des devis au même format, comparés en un clic</li><li><i>✓</i>SIRET, décennale et avis contrôlés avant tout contact</li><li><i>✓</i>Tout le chantier dans un seul fil</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="bridge"><div class="halo"></div><div class="wrap" style="position:relative">
+    <span class="kicker rv">De l'autre côté du chantier</span>
+    <h2 class="rv">Vous êtes poseur ? <span style="color:#2f80ff">Basculez.</span></h2>
+    <p class="sub rv d1" style="margin:18px auto 0">Un autre univers vous attend : demandes qualifiées, devis en trois clics, planning plein.</p>
+    <button class="btn btn-primary mag rv d2" data-switch="pro" style="background:linear-gradient(135deg,#2f80ff,#5ee1c8);box-shadow:0 10px 30px rgba(47,128,255,.4)">Passer côté poseur ⟳</button>
+  </div></div>
+
+  <section class="cta" id="telecharger">
+    <div class="cta-glow"></div>
+    <div class="wrap">
+      <div class="rv"><div class="gb "><div class="gbf"><div class="rw b"><div class="orbit"><div class="ospin"><i></i></div></div></div><div class="gbp"><img class="gbi" src="../scenes/particulier.webp" alt="" draggable="false"></div><div class="rw f"><div class="orbit"><div class="ospin"><i></i></div></div></div></div></div></div>
+      <span class="kicker rv">Téléchargez l'application</span>
+      <h2 class="rv">Votre prochain chantier<br>commence <span class="gt">ici.</span></h2>
+      <p class="sub rv d1" style="margin:18px auto 0">Gratuit pour les particuliers. Bientôt sur iPhone et Android.</p>
+      <div class="stores rv d2">
+        <a class="sb" href="#telecharger"><img src="../badges/app-store.png" alt="App Store"></a>
+        <a class="sb" href="#telecharger"><img src="../badges/google-play.png" alt="Google Play"></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ===================== UNIVERS POSEUR ===================== -->
+<main class="mode" id="pro">
+  <section class="hero">
+    <canvas class="motes" id="promotes"></canvas>
+    <div class="wrap">
+      <div>
+        <span class="eyebrow"><span class="dot"></span> Espace poseurs · Gratuit au lancement</span>
+        <h1>Des chantiers <span class="flip" data-flip><span class="on">qualifiés,</span><span>locaux,</span><span>sérieux,</span><span>planifiés,</span></span><br>zéro prospection.</h1>
+        <p class="lead">Recevez les demandes de votre zone, répondez en trois clics avec un <b>devis structuré</b>, concentrez-vous sur la pose. Vous traitez en direct avec le client, sans intermédiaire.</p>
+        <div style="display:flex;gap:14px;flex-wrap:wrap">
+          <a href="#rejoindre" class="btn btn-primary mag">Devenir poseur partenaire</a>
+          <a href="#demo-pro" class="btn btn-ghost mag">Voir les demandes en direct</a>
+        </div>
+        <div class="stats">
+          <div><b data-count="0" data-suffix=" €">0</b><span>d'abonnement au lancement</span></div>
+          <div><b data-count="3" data-suffix=" clics">0</b><span>pour envoyer un devis</span></div>
+          <div><b data-count="100" data-suffix="%">0</b><span>de demandes de votre zone</span></div>
+        </div>
+      </div>
+      <div class="stage" data-tilt>
+        <div class="glow"></div>
+        <i class="orb o1"></i><i class="orb o2"></i><i class="orb o3"></i>
+        <div class="phone"><div class="screen" data-screen="pro"><div class="island"></div><div class="reflect"></div></div></div>
+        <div class="tag t1"><span class="av" style="background:#2f80ff">+1</span><div><b>Nouvelle demande</b><span>Portail coulissant · 6 km</span></div></div>
+        <div class="tag t2"><span class="av" style="background:#5ee1c8;color:#06303a">€</span><div><b>Devis accepté</b><span>Clôture alu · 1 850 €</span></div></div>
+        <div class="tag t3"><span class="av" style="background:#1b2a4a">★</span><div><b>Avis 5★ publié</b><span>Chantier vérifié</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="marquee"><div class="track" data-track><span>Portaillistes</span><span>Menuisiers</span><span>Clôturistes</span><span>Poseurs de pergolas</span><span>Fermetures</span><span>Storistes</span><span>Installateurs de carports</span><span>Volets & motorisation</span></div></div>
+
+  <section id="demo-pro">
+    <div class="wrap grid2">
+      <div class="rv">
+        <span class="kicker">Votre zone, vos demandes</span>
+        <h2>Réglez votre rayon. Regardez les chantiers arriver.</h2>
+        <p class="sub">Chaque demande est déjà qualifiée : type, dimensions, photos, délai, code postal. Vous ne répondez qu'à ce qui vous intéresse.</p>
+        <ul style="list-style:none;margin-top:28px;display:grid;gap:14px;font-size:16px;color:#c9d2e6">
+          <li>→ Demandes locales qualifiées (type, dimensions, photos, délai)</li>
+          <li>→ Générateur de devis : main-d'œuvre, motorisation, déplacement, fournitures</li>
+          <li>→ Statuts clairs : nouvelle · devis envoyé · acceptée · terminée</li>
+          <li>→ Profil vérifié mis en avant auprès des particuliers de votre zone</li>
+        </ul>
+        <p style="font-size:12px;color:var(--muted);margin-top:22px">Démonstration : les demandes affichées sont fictives.</p>
+      </div>
+      <div class="feedbox rv d1">
+        <div class="top"><b>Demandes autour de Lyon</b><span class="pill blue" id="rqcount" style="font-size:9px">En direct</span></div>
+        <div class="zone" id="zone">
+          <img class="bgmap" id="bgmap" src="../nightmap.jpg" alt="" draggable="false">
+          <div class="rad"></div><span class="city">Lyon</span><div class="pulse"></div><div class="me"></div>
+          <div class="req" style="left:38%;top:36%"></div><div class="req" style="left:64%;top:30%"></div><div class="req" style="left:58%;top:70%"></div><div class="req" style="left:30%;top:66%"></div><div class="req" style="left:80%;top:56%"></div><div class="req" style="left:16%;top:30%"></div>
+          <span class="lbl">Rayon d'intervention</span>
+        </div>
+        <div class="rng"><span>Rayon</span><input type="range" id="rad" min="10" max="60" value="30" step="5"><b id="radv">30 km</b></div>
+        <div class="reqs" id="reqs"></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+    <div class="wrap">
+      <div class="rv" style="max-width:720px"><span class="kicker">Un outil de poseur, pas un annuaire</span><h2>Construit par un poseur. Dix ans de chantiers dedans.</h2><p class="sub">Mister Poseur est né d'un réseau de pose de portails et menuiseries. On connaît les devis refaits trois fois, les déplacements pour rien et les clients injoignables.</p></div>
+      <div class="bento">
+        <div class="cell c4 big rv"><div class="num gt" data-count="0">0</div><h3>€ d'abonnement au lancement</h3><p>Gratuit pour les premiers poseurs partenaires. La monétisation viendra avec les chantiers, pas avant.</p></div>
+        <div class="cell c4 rv d1"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h10M4 17h7"/></svg></div><h3>Devis en 3 clics</h3><p>Lignes pré-remplies : main-d'œuvre, motorisation, déplacement, fournitures. Envoyé depuis le camion.</p></div>
+        <div class="cell c4 rv d2"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7z"/></svg></div><h3>Votre zone, point final</h3><p>Vous ne voyez que les demandes dans votre rayon. Pas de chantier à 200 km.</p></div>
+        <div class="cell c6 rv"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg></div><h3>Un badge vérifié qui rassure</h3><p>Identité, SIRET, décennale contrôlés une fois : les particuliers le voient, vous signez plus vite.</p></div>
+        <div class="cell c6 rv d1"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M4 12h16M14 6l6 6-6 6"/></svg></div><h3>Relation directe avec le client</h3><p>Pas d'intermédiaire dans votre chantier : vous traitez, planifiez et facturez directement.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="bridge"><div class="halo"></div><div class="wrap" style="position:relative">
+    <span class="kicker rv">De l'autre côté du chantier</span>
+    <h2 class="rv">Vous avez des travaux à faire ? <span style="color:#f26b3a">Basculez.</span></h2>
+    <p class="sub rv d1" style="margin:18px auto 0">Retrouvez l'univers particulier : poseurs vérifiés, devis comparables, suivi de chantier.</p>
+    <button class="btn btn-primary mag rv d2" data-switch="part" style="background:linear-gradient(135deg,#f26b3a,#f9a03f);box-shadow:0 10px 30px rgba(242,107,58,.4)">Passer côté particulier ⟳</button>
+  </div></div>
+
+  <section class="cta" id="rejoindre">
+    <div class="cta-glow"></div>
+    <div class="wrap">
+      <div class="rv"><div class="gb blue"><div class="gbf"><div class="rw b"><div class="orbit"><div class="ospin"><i></i></div></div></div><div class="gbp"><img class="gbi" src="../scenes/poseur.webp" alt="" draggable="false"></div><div class="rw f"><div class="orbit"><div class="ospin"><i></i></div></div></div></div></div></div>
+      <span class="kicker rv">Rejoindre le réseau</span>
+      <h2 class="rv">Remplissez votre planning,<br>pas vos <span class="gt">soirées de prospection.</span></h2>
+      <p class="sub rv d1" style="margin:18px auto 0">Laissez votre e-mail : on vous ouvre l'accès poseur en priorité à l'ouverture de votre département.</p>
+      <form class="form rv d2" onsubmit="event.preventDefault();this.innerHTML='<p style=\'font-weight:800;padding:16px\'>Merci ! On vous écrit dès l\'ouverture de votre zone.</p>'">
+        <input type="email" required placeholder="votre@email.fr"><button type="submit">Devenir poseur partenaire</button>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <div class="brand" style="font-size:14px"><span class="mark" style="width:28px;height:28px;border-radius:8px"><img src="../logo.png" alt="Mister Poseur"></span>MISTER POSEUR</div>
+  <div class="links"><a href="#">CGU</a><a href="#">Confidentialité</a><a href="#">Contact</a><a href="#" data-switch="pro">Devenir poseur</a></div>
+  <div>© 2026 Mister Poseur · Écosystème MisterPortail</div>
+</div></footer>
+
+<script>
+(function(){
+/* ---------- ÉCRANS D'APP ---------- */
+var ST='<div class="status"><span>9:41</span><span>●●● 5G ▮</span></div>';
+var TAB=function(i,n){return '<div class="tabbar">'+n.map(function(x,k){return '<div class="'+(k===i?'on':'')+'"><i></i>'+x+'</div>'}).join('')+'</div><div class="homebar"></div>'};
+var S={
+devis:ST+'<div class="sc"><div class="s" style="margin-top:6px">Portail coulissant alu · 4 m</div><div class="h" style="font-size:17px;margin:2px 0 12px">3 devis reçus</div><div class="card" style="border:1.5px solid #f26b3a;margin-bottom:8px;position:relative"><span class="pill or" style="position:absolute;right:10px;top:10px">Meilleur rapport</span><div class="h" style="font-size:11.5px">Menuiserie Lefèvre</div><div class="s">★ 4.9 · Pose sous 3 semaines</div><div style="font-size:20px;font-weight:900;letter-spacing:-.02em;margin-top:8px">1 290 € <span class="s" style="font-weight:600">TTC pose</span></div></div><div class="card" style="margin-bottom:8px"><div class="h" style="font-size:11.5px">S. Bernard Fermetures</div><div class="s">★ 4.8 · Pose sous 5 semaines</div><div style="font-size:20px;font-weight:900;letter-spacing:-.02em;margin-top:8px">1 450 € <span class="s" style="font-weight:600">TTC pose</span></div></div><div class="card" style="margin-bottom:12px"><div class="h" style="font-size:11.5px">Alu Pose 69</div><div class="s">★ 4.7 · Pose sous 2 semaines</div><div style="font-size:20px;font-weight:900;letter-spacing:-.02em;margin-top:8px">1 520 € <span class="s" style="font-weight:600">TTC pose</span></div></div><div class="abtn or">Comparer les 3 devis</div><div class="s" style="text-align:center;margin-top:8px;font-size:8.5px">Devis détaillés · Poseurs vérifiés</div></div>'+TAB(1,['Accueil','Devis','Chantier','Profil']),
+search:ST+'<div class="sc"><div class="s" style="margin-top:6px">Bonjour 👋</div><div class="h" style="font-size:17px;margin:2px 0 12px">12 poseurs près de vous</div><div style="height:124px;border-radius:14px;margin-bottom:12px;position:relative;overflow:hidden;background:#e7e2d7;background-image:linear-gradient(#d9d3c6 1px,transparent 1px),linear-gradient(90deg,#d9d3c6 1px,transparent 1px);background-size:22px 22px"><span class="pill or" style="position:absolute;left:10px;bottom:10px">Lyon · 25 km</span></div><div class="card row" style="margin-bottom:8px"><span class="av" style="background:#1b2a4a">ML</span><div style="flex:1"><div class="h" style="font-size:11.5px">Menuiserie Lefèvre <span class="badge">✓ vérifié</span></div><div class="s">★ 4.9 · 128 avis · 6 km</div></div></div><div class="card row" style="margin-bottom:8px"><span class="av" style="background:#f26b3a">SB</span><div style="flex:1"><div class="h" style="font-size:11.5px">S. Bernard Fermetures <span class="badge">✓ vérifié</span></div><div class="s">★ 4.8 · 74 avis · 11 km</div></div></div><div class="card row"><span class="av" style="background:#f9a03f">AP</span><div style="flex:1"><div class="h" style="font-size:11.5px">Alu Pose 69 <span class="badge">✓ vérifié</span></div><div class="s">★ 4.7 · 52 avis · 18 km</div></div></div></div>'+TAB(0,['Accueil','Devis','Chantier','Profil']),
+pro:ST+'<div class="sc"><div class="s" style="margin-top:6px">Menuiserie Lefèvre · Lyon</div><div class="h" style="font-size:17px;margin:2px 0 12px">Vos demandes</div><div style="display:flex;gap:6px;margin-bottom:12px"><span class="pill blue">Nouvelles · 4</span><span class="pill grey">Envoyés · 7</span><span class="pill grey">Terminées</span></div><div class="card" style="margin-bottom:8px;border-color:#bcd3ff"><div class="row" style="justify-content:space-between"><div class="h" style="font-size:11.5px">Portail coulissant alu 4 m</div><span class="pill blue" style="padding:3px 7px">Nouveau</span></div><div class="s">Villeurbanne · 6 km · motorisation</div><div class="s" style="margin-top:6px;color:#1b2a4a;font-weight:700">📷 2 photos · dès que possible</div></div><div class="card" style="margin-bottom:8px"><div class="row" style="justify-content:space-between"><div class="h" style="font-size:11.5px">Clôture alu 18 ml</div><span class="pill blue" style="padding:3px 7px">Nouveau</span></div><div class="s">Bron · 9 km · sur muret</div></div><div class="card" style="margin-bottom:8px"><div class="row" style="justify-content:space-between"><div class="h" style="font-size:11.5px">6 fenêtres</div><span class="pill green" style="padding:3px 7px">Devis envoyé</span></div><div class="s">Caluire · 12 km · 1 780 €</div></div><div class="card" style="margin-bottom:10px"><div class="row" style="justify-content:space-between"><div class="h" style="font-size:11.5px">Volets roulants x4</div><span class="pill green" style="padding:3px 7px">Acceptée</span></div><div class="s">Lyon 3e · pose le 18 nov.</div></div><div class="abtn blue">Répondre avec un devis</div></div>'+TAB(0,['Demandes','Devis','Planning','Profil'])
+};
+document.querySelectorAll('[data-screen]').forEach(function(el){el.insertAdjacentHTML('beforeend',S[el.dataset.screen])});
+
+/* ---------- MODE / SWITCH / WIPE ---------- */
+var body=document.body,gate=document.getElementById('gate'),labs=document.querySelectorAll('.sw .lab'),navcta=document.getElementById('navcta');
+var loader=document.getElementById('loader'),coin=document.getElementById('coin'),fPart=document.getElementById('face-part'),fPro=document.getElementById('face-pro'),ltxt=document.getElementById('ltxt'),ldots=document.getElementById('ldots');
+var NAME={part:'particulier',pro:'poseur'},busy=false,dotsT=null;
+function applyMode(m){
+  body.setAttribute('data-mode',m);
+  document.querySelectorAll('.mode').forEach(function(x){x.classList.toggle('on',x.id===m)});
+  labs.forEach(function(l){l.classList.toggle('on',l.dataset.m===m)});
+  var th=document.querySelector('.sw .thumb'),disc=document.getElementById('disc');
+  disc.style.transform=m==='pro'?'translateX('+(-(th.offsetWidth-disc.offsetWidth-6))+'px) rotate(-180deg)':'translateX(0) rotate(0deg)';
+  navcta.textContent=m==='pro'?'Devenir poseur':'Télécharger l\'app';navcta.setAttribute('href',m==='pro'?'#rejoindre':'#telecharger');
+  document.title=m==='pro'?'Mister Poseur — Espace poseurs':'Mister Poseur — Un poseur vérifié, près de chez vous';
+  try{localStorage.setItem('mp-mode',m)}catch(e){}
+  requestAnimationFrame(function(){document.querySelectorAll('#'+m+' .rv').forEach(function(el){io.observe(el)});if(m==='part'&&typeof mapTick==='function'){camW=cam.offsetWidth;camH=cam.offsetHeight;mapTick();cx=tx;cy=ty}});
+}
+function switchTo(m){
+  var cur=body.getAttribute('data-mode');
+  if(busy||cur===m)return;busy=true;
+  /* pièce 3D : face avant = scène actuelle, face arrière = scène cible ; la pièce bascule à 180° avec son épaisseur */
+  var front=cur==='pro'?fPro:fPart,back=m==='pro'?fPro:fPart;
+  front.classList.remove('back');back.classList.add('back');
+  coin.style.transform='rotateX(0deg)';
+  var sh=document.querySelector('.lshadow');sh.style.transform='translateX(-50%)';sh.style.opacity='1';
+  ltxt.firstChild.nodeValue='Chargement du mode '+NAME[m];ltxt.classList.remove('sw');
+  var n=0;clearInterval(dotsT);dotsT=setInterval(function(){n=(n+1)%4;ldots.textContent='...'.slice(0,n)},380);
+  loader.classList.add('on');
+  /* rotation pilotée image par image (le compositeur aplatit la pièce si on laisse une transition CSS faire le travail) */
+  setTimeout(function(){
+    var D=1600,t0=performance.now();
+    var ease=function(t){var c=.9;return t<.5?(Math.pow(2*t,2)*((c+1)*2*t-c))/2:(Math.pow(2*t-2,2)*((c+1)*(t*2-2)+c)+2)/2};
+    (function fr(now){var t=Math.min(1,(now-t0)/D),e=ease(t),a=-180*e;
+      coin.style.transform='rotateX('+a.toFixed(2)+'deg)';
+      var s=Math.abs(Math.cos(a*Math.PI/180));sh.style.transform='translateX(-50%) scaleX('+(.55+.45*s).toFixed(3)+')';sh.style.opacity=(.5+.5*s).toFixed(2);
+      if(t<1)requestAnimationFrame(fr)})(t0);
+  },450);
+  setTimeout(function(){applyMode(m);window.scrollTo({top:0,behavior:'auto'})},1250);
+  setTimeout(function(){loader.classList.remove('on')},2450);
+  setTimeout(function(){clearInterval(dotsT);busy=false},2900);
+}
+document.getElementById('sw').addEventListener('click',function(e){
+  switchTo(body.getAttribute('data-mode')==='pro'?'part':'pro');
+});
+document.querySelectorAll('[data-switch]').forEach(function(b){b.addEventListener('click',function(e){e.preventDefault();switchTo(b.dataset.switch)})});
+/* gate */
+document.querySelectorAll('.gpanel').forEach(function(p){
+  p.addEventListener('mouseenter',function(){gate.classList.add('hover-'+p.dataset.pick)});
+  p.addEventListener('mouseleave',function(){gate.classList.remove('hover-part','hover-pro')});
+  p.addEventListener('click',function(e){e.preventDefault();if(gate._picked)return;gate._picked=true;var m=p.dataset.pick;
+    gate.classList.remove('intro','hover-part','hover-pro');gate.classList.add('pick-'+m);applyMode(m);
+    setTimeout(function(){gate.classList.add('away');body.classList.remove('locked')},650);
+    setTimeout(function(){gate.style.display='none';gate._gone=true},1900)});
+});
+document.getElementById('brandlink').addEventListener('click',function(e){e.preventDefault();window.scrollTo({top:0,behavior:'smooth'})});
+applyMode('part');
+
+
+/* ---------- CARTE DE FRANCE (V1) ---------- */
+var ms=document.querySelector('.mapstory'),mf=document.getElementById('mapfixed'),pinsLayer=document.getElementById('pins'),dim=document.getElementById('mapdim'),cam=document.getElementById('cam'),pinsEl=[].slice.call(document.querySelectorAll('.pin')),stcs=document.querySelectorAll('.stc'),ht=document.getElementById('herotext'),cnt=document.getElementById('cnt'),regn=document.getElementById('regname');
+var PATH=[[0.52,0.24,'Bretagne · Normandie · Île-de-France'],[0.52,0.40,'Pays de la Loire · Centre'],[0.52,0.54,'Bourgogne · Auvergne · Rhône-Alpes'],[0.52,0.68,'Nouvelle-Aquitaine · Occitanie'],[0.52,0.84,'Provence · Côte d\'Azur · Corse'],[0.52,0.98,'Méditerranée']];
+var shown=0,cx=0,cy=0,tx=0,ty=0,queue=[],camW=cam.offsetWidth,camH=cam.offsetHeight;
+function camLoop(){cx+=(tx-cx)*.16;cy+=(ty-cy)*.16;cam.style.transform='translate3d('+cx.toFixed(2)+'px,'+cy.toFixed(2)+'px,0)';requestAnimationFrame(camLoop)}
+setInterval(function(){var k=queue.length>5?2:1;while(k--){var e=queue.shift();if(e){e._on=true;e.classList.add('on')}}var n=0;pinsEl.forEach(function(x){if(x._on)n++});if(cnt.textContent!=n)cnt.textContent=n},220);
+pinsEl.forEach(function(e){e._x=parseFloat(e.style.left)/100;e._y=parseFloat(e.style.top)/100;e._on=false});
+function lerpPath(p){var s=p*(PATH.length-1),i=Math.min(PATH.length-2,Math.floor(s)),t=s-i;var e=t*t*(3-2*t);return [PATH[i][0]+(PATH[i+1][0]-PATH[i][0])*e,PATH[i][1]+(PATH[i+1][1]-PATH[i][1])*e,PATH[Math.round(s)][2]]}
+function mapTick(){
+  if(body.getAttribute('data-mode')!=='part')return;
+  if(!camW){camW=cam.offsetWidth;camH=cam.offsetHeight}
+  var r=ms.getBoundingClientRect();var p=Math.max(0,Math.min(1,-r.top/(r.height-window.innerHeight)));
+  var past=Math.max(0,Math.min(1,(-(r.bottom-window.innerHeight))/320));pinsLayer.style.opacity=1-past;dim.style.opacity=past*.55;
+  mf.style.opacity=r.bottom<-200?0:1;
+  ht.style.opacity=Math.max(0,1-p*9);ht.style.pointerEvents=p>.1?'none':'auto';
+  var f=lerpPath(p);var W=camW,H=camH,vw=window.innerWidth,vh=window.innerHeight;
+  var fx=vw>980?vw*.66:vw*.5,fy=vw>980?vh*.5:vh*.42;
+  tx=fx-f[0]*W;ty=fy-f[1]*H;
+  if(regn.textContent!==f[2])regn.textContent=f[2];
+  stcs.forEach(function(s){s.classList.toggle('on',p>=+s.dataset.from&&p<+s.dataset.to)});
+  pinsEl.forEach(function(e){var sy=ty+e._y*H,sx=tx+e._x*W;
+    if(!e._on&&!e._q&&sy>-vh*.05&&sy<vh*.66&&sx>-20&&sx<vw+20){e._q=true;queue.push(e)}
+    e.style.opacity=(vw>980&&sx<vw*.46)?.18:1;
+  });
+}
+window.addEventListener('scroll',function(){requestAnimationFrame(mapTick)},{passive:true});
+window.addEventListener('resize',function(){camW=cam.offsetWidth;camH=cam.offsetHeight;mapTick()});
+mapTick();cx=tx;cy=ty;camLoop();
+
+/* ---------- FLIP WORDS ---------- */
+document.querySelectorAll('[data-flip]').forEach(function(f){var fl=f.children,fi=0;
+  setInterval(function(){var cur=fl[fi];cur.classList.remove('on');cur.classList.add('out');fi=(fi+1)%fl.length;var nx=fl[fi];nx.classList.remove('out');void nx.offsetWidth;nx.classList.add('on');setTimeout(function(){cur.classList.remove('out')},600)},2400)});
+
+/* ---------- NAV / MARQUEE / REVEAL / COUNT ---------- */
+var nav=document.getElementById('nav');
+window.addEventListener('scroll',function(){nav.classList.toggle('scrolled',window.scrollY>20)},{passive:true});
+document.querySelectorAll('[data-track]').forEach(function(t){t.innerHTML+=t.innerHTML});
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);e.target.querySelectorAll('[data-count]').forEach(count);if(e.target.hasAttribute('data-count'))count(e.target)}})},{threshold:.15});
+document.querySelectorAll('.stats').forEach(function(el){el.classList.add('rv')});
+document.querySelectorAll('.rv').forEach(function(el){io.observe(el)});
+function count(el){if(el._done)return;el._done=true;var to=+el.dataset.count,suf=el.dataset.suffix||'',s=performance.now();(function f(n){var p=Math.min(1,(n-s)/1400);el.textContent=Math.round(to*(1-Math.pow(1-p,3)))+suf;if(p<1)requestAnimationFrame(f)})(s)}
+
+/* ---------- TILT ---------- */
+document.querySelectorAll('[data-tilt]').forEach(function(st){var ph=st.querySelector('.phone');ph.style.transform='rotateY(-14deg) rotateX(5deg) rotateZ(2deg)';
+  st.addEventListener('mousemove',function(e){var r=st.getBoundingClientRect();var x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;ph.style.transform='rotateY('+(-14+x*30)+'deg) rotateX('+(5-y*20)+'deg) rotateZ(2deg)'});
+  st.addEventListener('mouseleave',function(){ph.style.transform='rotateY(-14deg) rotateX(5deg) rotateZ(2deg)'})});
+
+/* ---------- DEMO PRO : rayon + demandes ---------- */
+var zone=document.getElementById('zone'),rad=document.getElementById('rad'),radv=document.getElementById('radv'),reqs=document.getElementById('reqs'),rqc=document.getElementById('rqcount');
+var R=[['Portail coulissant alu 4 m','Villeurbanne · 6 km · motorisation','1 290 €',6],['Clôture alu 18 ml','Bron · 9 km · sur muret','1 850 €',9],['6 fenêtres PVC','Caluire · 12 km','2 140 €',12],['Volets roulants x4','Lyon 3e · 14 km','980 €',14],['Pergola bioclimatique','Meyzieu · 22 km','2 460 €',22],['Porte de garage sectionnelle','Vienne · 31 km','1 640 €',31]];
+R.forEach(function(x,i){var d=document.createElement('div');d.className='rq';d.innerHTML='<span class="av" style="background:'+['#2f80ff','#1b2a4a','#5ee1c8','#2f80ff','#1b2a4a','#5ee1c8'][i]+';color:#fff">'+(i+1)+'</span><div><div class="nm">'+x[0]+' <span class="new">Nouveau</span></div><div class="mt">'+x[1]+'</div></div><div class="pr"><b>'+x[2]+'</b><span>estimation</span></div>';d._km=x[3];reqs.appendChild(d)});
+var dots=zone.querySelectorAll('.req'),cards=reqs.querySelectorAll('.rq');
+var bgm=document.getElementById('bgmap');function centerMap(){var w=zone.clientWidth,hh=zone.clientHeight,bw=1600,bh=1600*1010/1050;bgm.style.left=(w/2-.6729*bw)+'px';bgm.style.top=(hh/2-.5584*bh)+'px'}
+window.addEventListener('resize',centerMap);centerMap();
+function updZone(){centerMap();var km=+rad.value;radv.textContent=km+' km';var px=Math.round(60+km*2.6);zone.style.setProperty('--r',px+'px');var n=0;
+  cards.forEach(function(c,i){var on=c._km<=km;setTimeout(function(){c.classList.toggle('on',on);dots[i].classList.toggle('on',on)},i*90);if(on)n++});
+  rqc.textContent=n+' demande'+(n>1?'s':'')+' dans votre rayon';}
+rad.addEventListener('input',updZone);
+var zo=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){updZone();zo.unobserve(e.target)}})},{threshold:.3});zo.observe(zone);
+
+
+/* ================= MAGIE ================= */
+var RM=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+/* --- coupoles : pivot sur elles-mêmes + parallaxe souris --- */
+var bowls=[].slice.call(document.querySelectorAll('.gb')).map(function(g,i){return {g:g,img:g.querySelector('.gbi'),ph:i*2.1}});
+var pmx=0,pmy=0,smx=0,smy=0;
+window.addEventListener('mousemove',function(e){pmx=e.clientX/window.innerWidth-.5;pmy=e.clientY/window.innerHeight-.5},{passive:true});
+window.addEventListener('deviceorientation',function(e){if(e.gamma==null)return;pmx=Math.max(-.5,Math.min(.5,e.gamma/50));pmy=Math.max(-.5,Math.min(.5,(e.beta-45)/60))},{passive:true});
+/* --- intro : les deux coupoles gravitent l'une autour de l'autre --- */
+var gbP=document.querySelector('.gpanel.part .gb'),gbR=document.querySelector('.gpanel.pro .gb'),introT0=null,INTRO=3200;
+function introFrame(now){
+  if(introT0===null){introT0=now;var a=gbP.getBoundingClientRect(),b=gbR.getBoundingClientRect();gate._hx=((b.left+b.width/2)-(a.left+a.width/2))/2;gate._hy=((b.top+b.height/2)-(a.top+a.height/2))/2;gbP.style.transition=gbR.style.transition='none'}
+  var t=Math.min(1,(now-introT0)/INTRO);if(gate._picked)t=1;
+  var e=t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2,a=e*Math.PI*2,c=Math.cos(a),d=Math.sin(a),hx=gate._hx,hy=gate._hy;
+  /* particulier part de la gauche, passe devant ; poseur passe derrière */
+  gbP.style.transform='translate('+(hx*(1-c)).toFixed(1)+'px,'+(hy*(1-c)+d*18).toFixed(1)+'px) scale('+(1+.28*d).toFixed(3)+')';
+  gbR.style.transform='translate('+(-hx*(1-c)).toFixed(1)+'px,'+(-hy*(1-c)-d*18).toFixed(1)+'px) scale('+(1-.28*d).toFixed(3)+')';
+  gbP.parentNode.style.zIndex=d>=0?2:1;gbR.parentNode.style.zIndex=d>=0?1:2;
+  gbR.style.filter='brightness('+(1-.45*Math.max(0,d)).toFixed(2)+')';gbP.style.filter='brightness('+(1-.45*Math.max(0,-d)).toFixed(2)+')';
+  if(t<1)requestAnimationFrame(introFrame);
+  else{[gbP,gbR].forEach(function(g){g.style.transform='';g.style.filter='';g.parentNode.style.zIndex='';void g.offsetWidth;g.style.transition=''});gate.classList.remove('intro')}
+}
+if(RM){gate.classList.remove('intro')}else{setTimeout(function(){requestAnimationFrame(introFrame)},350)}
+function bowlLoop(now){
+  smx+=(pmx-smx)*.06;smy+=(pmy-smy)*.06;var t=now/1000;
+  for(var i=0;i<bowls.length;i++){var b=bowls[i];if(!b.g.offsetParent)continue;
+    var ry=(RM?0:Math.sin(t*.7+b.ph)*15)+smx*22,rx=-smy*10;
+    b.img.style.transform='rotateY('+ry.toFixed(2)+'deg) rotateX('+rx.toFixed(2)+'deg)';}
+  requestAnimationFrame(bowlLoop)}
+requestAnimationFrame(bowlLoop);
+/* --- particules lumineuses --- */
+function motes(cv,opt){
+  var ctx=cv.getContext('2d'),W=0,H=0,P=[],dpr=Math.min(1.5,window.devicePixelRatio||1);
+  function size(){W=cv.clientWidth;H=cv.clientHeight;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}
+  size();window.addEventListener('resize',size);
+  for(var i=0;i<opt.n;i++)P.push({x:Math.random(),y:Math.random(),vx:(Math.random()-.5)*.00035,vy:-(Math.random()*.0005+.00012),r:Math.random()*2.2+.6,tw:Math.random()*6.28});
+  (function fr(now){requestAnimationFrame(fr);if(!opt.live()||!W)return;if(!cv.clientWidth)return;if(cv.clientWidth!==W||cv.clientHeight!==H)size();
+    ctx.clearRect(0,0,W,H);ctx.globalCompositeOperation='lighter';
+    for(var i=0;i<P.length;i++){var p=P[i];p.x+=p.vx+smx*.0004*p.r;p.y+=p.vy;if(p.y<-.03){p.y=1.03;p.x=Math.random()}if(p.x<-.03)p.x=1.03;if(p.x>1.03)p.x=-.03;
+      var x=p.x*W,y=p.y*H,c=opt.color(p.x,p.y,i),al=.35+.35*Math.sin(now/700+p.tw),R=p.r*5;
+      var g=ctx.createRadialGradient(x,y,0,x,y,R);g.addColorStop(0,'rgba('+c+','+al.toFixed(2)+')');g.addColorStop(1,'rgba('+c+',0)');
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,R,0,6.283);ctx.fill();
+      if(opt.link)for(var j=i+1;j<P.length;j++){var q=P[j],dx=(q.x-p.x)*W,dy=(q.y-p.y)*H,dd=dx*dx+dy*dy;if(dd<12000){ctx.strokeStyle='rgba('+c+','+(.16*(1-dd/12000)).toFixed(3)+')';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(q.x*W,q.y*H);ctx.stroke()}}
+    }})(0);
+}
+if(!RM){
+  var vertical=function(){return window.innerWidth<=860};
+  motes(document.getElementById('gcanvas'),{n:90,live:function(){return !gate._gone},color:function(x,y){return (vertical()?y<.5:x<.5)?'242,107,58':'47,128,255'}});
+  motes(document.getElementById('promotes'),{n:54,link:true,live:function(){return body.getAttribute('data-mode')==='pro'&&window.scrollY<window.innerHeight},color:function(x,y,i){return i%3?'47,128,255':'94,225,200'}});
+}
+/* --- barre de progression --- */
+var sprog=document.getElementById('sprog');
+window.addEventListener('scroll',function(){var m=document.documentElement.scrollHeight-window.innerHeight;sprog.style.transform='scaleX('+(m>0?window.scrollY/m:0).toFixed(4)+')'},{passive:true});
+/* --- titres mot à mot --- */
+document.querySelectorAll('main h2').forEach(function(h2){var i=0,out=[];
+  [].slice.call(h2.childNodes).forEach(function(n){
+    if(n.nodeType===3){n.nodeValue.split(/(\s+)/).forEach(function(w){if(!w)return;if(/^\s+$/.test(w)){out.push(document.createTextNode(' '));return}var s=document.createElement('span');s.className='w';s.style.setProperty('--i',i++);s.textContent=w;out.push(s)})}
+    else if(n.nodeName==='BR'){out.push(n)}
+    else{var s=document.createElement('span');s.className='w';s.style.setProperty('--i',i++);s.appendChild(n);out.push(s)}});
+  h2.textContent='';out.forEach(function(n){h2.appendChild(n)});h2.classList.add('split')});
+/* --- cartes en relief 3D --- */
+if(window.matchMedia('(pointer:fine)').matches&&!RM){
+  document.querySelectorAll('.cell,.step').forEach(function(el){
+    el.addEventListener('mousemove',function(e){var r=el.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;el.classList.add('tilt-on');el.style.transform='perspective(900px) rotateY('+(x*9).toFixed(2)+'deg) rotateX('+(-y*9).toFixed(2)+'deg) translateY(-6px) scale(1.015)'});
+    el.addEventListener('mouseleave',function(){el.classList.remove('tilt-on');el.style.transform=''})});
+}
+
+/* ---------- MAGNÉTIQUE + SPOTLIGHT ---------- */
+if(window.matchMedia('(pointer:fine)').matches){
+  document.querySelectorAll('.mag').forEach(function(el){
+    el.addEventListener('mousemove',function(e){var r=el.getBoundingClientRect();var x=e.clientX-r.left-r.width/2,y=e.clientY-r.top-r.height/2;el.style.transform='translate('+x*.25+'px,'+y*.25+'px)'});
+    el.addEventListener('mouseleave',function(){el.style.transform=''})});
+  document.querySelectorAll('.cell').forEach(function(el){el.addEventListener('mousemove',function(e){var r=el.getBoundingClientRect();el.style.setProperty('--x',(e.clientX-r.left)+'px');el.style.setProperty('--y',(e.clientY-r.top)+'px')})});
+}
+})();
+</script>
+</body>
+</html>
